@@ -23,7 +23,8 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
   tag.textContent = '광고';
 
   const sizeText = document.createElement('span');
-  const isImageAd = slot.imageUrl && isSafeUrl(slot.imageUrl) && isSafeUrl(slot.linkUrl);
+  const imageUrl = resolveImageUrl(slot.imageUrl);
+  const isImageAd = imageUrl && isSafeUrl(imageUrl) && isSafeUrl(slot.linkUrl);
   if (isImageAd) {
     const link = document.createElement('a');
     link.className = 'ad-slot__link';
@@ -31,7 +32,7 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
     link.target = '_blank';
     link.rel = 'noopener noreferrer sponsored';
     const image = document.createElement('img');
-    image.src = slot.imageUrl;
+    image.src = imageUrl;
     image.alt = slot.alt || '광고';
     image.width = slot.width;
     image.height = slot.height;
@@ -150,4 +151,14 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
 
   container.replaceChildren(...children);
   container.hidden = false;
+}
+
+// 'images/ad-side.jpg'처럼 이 사이트 안의 경로도 받도록 전체 주소로 바꿈
+function resolveImageUrl(value) {
+  if (!value) return '';
+  try {
+    return new URL(value, document.baseURI).href;
+  } catch {
+    return '';
+  }
 }

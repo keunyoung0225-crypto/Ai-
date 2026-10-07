@@ -176,6 +176,7 @@ export const EXPORT_FIELDS = [
 // 광고 영역. 넓은 화면(1100px 이상)은 왼쪽(side), 좁은 화면은 맨 아래(bottom)에 표시합니다.
 // (화면 너비 기준은 css/components.css의 '광고 영역' 부분과 같아야 합니다)
 // - imageUrl(광고 이미지 주소)과 linkUrl(누르면 갈 주소)을 채우면 그 광고가 나오고, 비워 두면 빈 광고 틀이 보입니다.
+//   imageUrl은 저장소 images 폴더에 올린 파일이면 'images/파일이름.jpg'처럼 짧게 적어도 됩니다.
 // - enabled를 false로 하면 그 광고 영역을 숨깁니다.
 // - resizable: true면 광고 틀 아래 손잡이를 끌어(또는 키보드 ↑↓) 세로 높이를 minHeight~maxHeight 사이에서 조절할 수 있습니다.
 //   조절한 높이는 이 브라우저에 기억되고(storageKey), 손잡이를 두 번 누르면 height(기본 높이)로 돌아갑니다.
@@ -188,7 +189,7 @@ export const AD_SLOTS = {
     maxHeight: 900,
     resizable: true,
     storageKey: STORAGE_KEYS.adSideHeight,
-    imageUrl: 'https://keunyoung0225-crypto.github.io/Ai-/images/ad-side.png',
+    imageUrl: 'images/ad-side.jpg',
     linkUrl: 'https://www.forest.go.kr',
     alt: '산림청 홈페이지 산불조심',
   },
