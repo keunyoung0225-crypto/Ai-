@@ -210,6 +210,7 @@ node scripts/notify.mjs --dry-run --since 2026-01-01
   조절한 높이는 이 브라우저에 기억되고, 손잡이를 두 번 누르면 기본 높이로 돌아갑니다. 화면보다 길어지지 않도록 자동으로 줄어듭니다.
   기본·최소·최대 높이는 `height`·`minHeight`·`maxHeight`, 손잡이를 없애려면 `resizable: false`로 설정합니다.
 - `imageUrl`(광고 이미지 주소)과 `linkUrl`(누르면 갈 주소, `https://`)을 채우면 그 이미지 광고가 나오고, 누르면 새 창으로 열립니다.
+  - 광고 이미지는 저장소의 `images` 폴더에 올리고 `imageUrl: 'images/파일이름.jpg'`처럼 적으면 됩니다. (다른 사이트의 이미지는 `https://`로 시작하는 전체 주소)
 - `enabled: false`로 하면 그 영역을 숨깁니다.
 - 애드센스 같은 광고 네트워크를 쓰려면 그 서비스가 주는 코드를 `js/components/adSlot.js`의 빈 틀 대신 넣으면 됩니다.
   (광고 네트워크는 사이트 심사와 `ads.txt` 등 별도 절차가 필요합니다)
