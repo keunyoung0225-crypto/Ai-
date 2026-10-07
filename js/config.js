@@ -25,10 +25,20 @@ export const CATEGORIES = [
   { id: 'entrusted', label: '위수탁지원사업' },
 ];
 
-// 검색 조건. type: 'text' | 'select' | 'dateRange'
+// 검색 조건. type: 'keyword' | 'text' | 'select' | 'dateRange'
+// - keyword는 fields에 적은 여러 항목을 한꺼번에 검색합니다. (띄어쓰기로 여러 단어 → 모두 포함된 공고)
+// - wide: true면 검색 폼에서 한 줄 전체를 차지합니다.
 // - select의 선택지는 데이터에서 자동으로 추출합니다.
 // - dateRange는 날짜(문자열)이면 해당 날짜가, 기간({start, end})이면 기간이 검색 범위와 겹치는지 검사합니다.
 export const SEARCH_FIELDS = [
+  {
+    key: 'keyword',
+    label: '키워드',
+    type: 'keyword',
+    fields: ['title', 'content', 'target', 'agency'],
+    placeholder: '공고명·사업내용·지원대상·기관에서 찾기 (예: 청년 창업)',
+    wide: true,
+  },
   { key: 'title', label: '공고명', type: 'text', placeholder: '공고명을 입력하세요' },
   { key: 'announceDate', label: '공고일', type: 'dateRange' },
   { key: 'agency', label: '주체기관', type: 'select', placeholder: '전체 기관' },

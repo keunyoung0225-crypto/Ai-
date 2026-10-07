@@ -4,6 +4,7 @@
 
 ## 주요 기능
 - **검색유형 버튼**: 전체 / 수의계약 / 위수탁지원사업 (누르면 바로 필터링)
+- **키워드 검색**: 공고명·사업내용·지원대상·기관을 한꺼번에 검색 (띄어쓰기로 여러 단어를 넣으면 모두 포함된 공고)
 - **조건 검색**: 공고명, 공고일(기간), 주체기관, 사업기간(기간)
 - **결과 표**: 공고일 · 주체기관 · 사업기간 · 정책사업내용 · 예산 · 지원마감일
   - 정책사업내용 칸에 공고명(굵게)과 사업 요약을 함께 표시
@@ -69,7 +70,8 @@ data/policies.json      공고 데이터
 |---|---|
 | 카테고리 추가 | `js/config.js`의 `CATEGORIES`에 한 줄 추가 + 데이터 `category` 값 맞추기 |
 | 표 열 추가·순서 변경 | `js/config.js`의 `COLUMNS` |
-| 검색 조건 추가 | `js/config.js`의 `SEARCH_FIELDS` (`text` / `select` / `dateRange`) — URL 공유도 자동 적용 |
+| 검색 조건 추가 | `js/config.js`의 `SEARCH_FIELDS` (`keyword` / `text` / `select` / `dateRange`) — URL 공유도 자동 적용 |
+| 키워드 검색 대상 항목 | `js/config.js`의 `SEARCH_FIELDS` 중 `keyword`의 `fields` |
 | 정렬 가능한 열 추가 | `js/config.js`의 `COLUMNS` 항목에 `sort` 추가 |
 | 상세 보기 항목 변경 | `js/config.js`의 `DETAIL_FIELDS` |
 | 한 번에 보이는 건수, 마감 임박 기준 | `js/config.js`의 `PAGE_SIZE`, `DEADLINE_WARNING_DAYS` |

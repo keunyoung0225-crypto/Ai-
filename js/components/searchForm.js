@@ -56,6 +56,9 @@ const fieldBuilders = {
   },
 };
 
+// 키워드 입력칸은 일반 텍스트 입력칸과 같음
+fieldBuilders.keyword = fieldBuilders.text;
+
 export function createSearchForm(container, fields, { options = {}, onSearch, onReset }) {
   const form = document.createElement('form');
   form.className = 'search-form';
@@ -66,7 +69,7 @@ export function createSearchForm(container, fields, { options = {}, onSearch, on
     const control = fieldBuilders[field.type](field, id, options[field.key]);
 
     const wrapper = document.createElement('div');
-    wrapper.className = 'search-field';
+    wrapper.className = field.wide ? 'search-field search-field--wide' : 'search-field';
     const label = document.createElement('label');
     label.className = 'search-field__label';
     label.htmlFor = id;

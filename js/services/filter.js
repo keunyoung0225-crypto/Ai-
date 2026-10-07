@@ -1,11 +1,22 @@
 // 검색·정렬 로직 (화면과 무관한 순수 함수).
 
-// 검색 필드 type별 일치 여부 판단
+// 검색 필드 type별 일치 여부 판단: (공고의 해당 값, 검색 조건, 필드 정의, 공고 전체)
 const matchers = {
   text(value, query) {
     const needle = (query ?? '').trim().toLowerCase();
     if (!needle) return true;
     return String(value ?? '').toLowerCase().includes(needle);
+  },
+
+  // 여러 항목(field.fields)을 한꺼번에 검색. 띄어쓰기로 나눈 단어가 모두 들어 있어야 일치
+  keyword(value, query, field, policy) {
+    const words = (query ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return true;
+    const haystack = field.fields
+      .map((key) => policy[key] ?? '')
+      .join(' ')
+      .toLowerCase();
+    return words.every((word) => haystack.includes(word));
   },
 
   select(value, selected) {
@@ -27,7 +38,9 @@ export function filterPolicies(policies, { category, filters }, fields) {
   return policies.filter(
     (policy) =>
       (category === 'all' || policy.category === category) &&
-      fields.every((field) => matchers[field.type](policy[field.key], filters[field.key])),
+      fields.every((field) =>
+        matchers[field.type](policy[field.key], filters[field.key], field, policy),
+      ),
   );
 }
 
