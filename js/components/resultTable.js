@@ -2,21 +2,28 @@
 // 모바일(좁은 화면)에서는 CSS가 각 행을 카드 형태로 바꿔 보여줍니다. (td의 data-label 사용)
 import { formatValue } from '../services/format.js';
 import { createDeadlineBadge } from './deadlineBadge.js';
+import { createFavoriteButton, setFavoriteState } from './favoriteButton.js';
 
 const ARIA_SORT = { asc: 'ascending', desc: 'descending' };
 const SORT_ARROW = { asc: '▲', desc: '▼' };
 
 // 특수한 칸 그리기 방식 (열 정의의 render 이름으로 선택)
 const cellRenderers = {
-  // 공고명(누르면 상세 보기) + 사업 요약
-  titleWithSummary(policy, column, { onOpenDetail }) {
+  // 관심공고 별 + 공고명(누르면 상세 보기) + 사업 요약
+  titleWithSummary(policy, column, { onOpenDetail, onToggleFavorite, favorites }) {
     const fragment = document.createDocumentFragment();
+    const head = document.createElement('div');
+    head.className = 'policy-head';
     const title = document.createElement('button');
     title.type = 'button';
     title.className = 'policy-title';
     title.textContent = policy.title ?? '-';
     title.addEventListener('click', () => onOpenDetail(policy.id));
-    fragment.append(title);
+    head.append(
+      createFavoriteButton(policy, { isFavorite: favorites.has(policy.id), onToggle: onToggleFavorite }),
+      title,
+    );
+    fragment.append(head);
 
     if (policy.content) {
       const summary = document.createElement('p');
@@ -45,8 +52,12 @@ function createMessage(text, isError = false) {
 }
 
 // summary: '검색결과 N건'을 표시할 요소
-export function createResultTable(container, columns, { summary, onSort, onOpenDetail, deadlineWarningDays }) {
-  const context = { onOpenDetail, deadlineWarningDays };
+export function createResultTable(
+  container,
+  columns,
+  { summary, onSort, onOpenDetail, onToggleFavorite, deadlineWarningDays },
+) {
+  const context = { onOpenDetail, onToggleFavorite, deadlineWarningDays, favorites: new Set() };
 
   const table = document.createElement('table');
   table.className = 'result-table';
@@ -131,14 +142,15 @@ export function createResultTable(container, columns, { summary, onSort, onOpenD
     },
 
     // policies: 화면에 보여줄 공고, total: 검색된 전체 건수
-    render(policies, { total, sort }) {
+    render(policies, { total, sort, favorites, emptyText }) {
+      context.favorites = favorites;
       summary.replaceChildren('검색결과 ');
       const count = document.createElement('strong');
       count.textContent = total.toLocaleString('ko-KR');
       summary.append(count, '건');
 
       if (!total) {
-        body.replaceChildren(createMessage('조건에 맞는 공고가 없습니다. 검색 조건을 바꿔 보세요.'));
+        body.replaceChildren(createMessage(emptyText ?? '조건에 맞는 공고가 없습니다. 검색 조건을 바꿔 보세요.'));
         return;
       }
       renderSortState(sort);
@@ -146,9 +158,17 @@ export function createResultTable(container, columns, { summary, onSort, onOpenD
       body.replaceChildren(tableWrap);
     },
 
+    // 표를 다시 그리지 않고 별 표시만 갱신 (누른 버튼의 초점 유지)
+    setFavorites(favorites) {
+      context.favorites = favorites;
+      tbody.querySelectorAll('[data-favorite-id]').forEach((button) => {
+        setFavoriteState(button, favorites.has(button.dataset.favoriteId));
+      });
+    },
+
     // '더보기' 후 새로 나타난 첫 공고로 키보드 초점 이동
     focusRow(index) {
-      tbody.rows[index]?.querySelector('button, a')?.focus();
+      tbody.rows[index]?.querySelector('.policy-title')?.focus();
     },
   };
 }

@@ -4,9 +4,19 @@
 export const APP_TITLE = '2026년 정책모아';
 export const APP_SUBTITLE = '수의계약·위수탁지원사업 공고를 한눈에 찾아보세요';
 
-// 데이터 출처: 'json'(로컬 샘플) | 'api'(공공데이터 API, 추후 구현)
+// 데이터 출처: 'json'(로컬 샘플) | 'api'(외부 API)
 export const DATA_SOURCE = 'json';
 export const DATA_URL = 'data/policies.json';
+
+// API 설정 (DATA_SOURCE가 'api'일 때 사용)
+// ※ 인증키를 이 파일에 넣으면 누구나 볼 수 있습니다. 키가 필요한 공공 API는
+//   자체 서버(프록시)를 거쳐 호출하고, 여기에는 그 서버 주소만 적으세요.
+export const API_CONFIG = {
+  endpoint: '', // 예: 'https://내-서버/api/policies'
+  params: {}, // 요청마다 붙일 쿼리 파라미터
+  adapter: 'standard', // 응답을 공고 데이터로 바꾸는 방식 (js/data/adapters/)
+  fallbackToJson: true, // API 실패 시 샘플 JSON으로 대체
+};
 
 // 검색유형 버튼. id는 데이터의 category 값과 일치해야 합니다. ('all'은 전체)
 export const CATEGORIES = [
@@ -79,3 +89,27 @@ export const PAGE_SIZE = 10;
 
 // 마감 임박으로 강조할 기준(일)
 export const DEADLINE_WARNING_DAYS = 7;
+
+// 브라우저 저장 키 (관심공고·화면 모드는 이 기기에만 저장됩니다)
+// theme 키는 index.html의 화면 깜빡임 방지 스크립트에도 같은 값이 있습니다.
+export const STORAGE_KEYS = {
+  favorites: 'policyMoa.favorites',
+  theme: 'policyMoa.theme',
+};
+
+// 엑셀(CSV) 다운로드 항목. 날짜는 엑셀이 인식하도록 YYYY-MM-DD, 예산은 원 단위 숫자로 저장
+export const EXPORT_FIELDS = [
+  { key: 'title', label: '공고명' },
+  { key: 'category', label: '검색유형', format: 'category' },
+  { key: 'announceDate', label: '공고일' },
+  { key: 'agency', label: '주체기관' },
+  { key: 'period', label: '사업기간', format: 'range' },
+  { key: 'content', label: '정책사업내용' },
+  { key: 'target', label: '지원대상' },
+  { key: 'budget', label: '예산(원)' },
+  { key: 'deadline', label: '지원마감일' },
+];
+
+// 상세 보기의 '비슷한 공고' 추천: 'rule'(규칙 기반) | 'ai'(AI 서버 연결 후 사용)
+export const RECOMMENDER = 'rule';
+export const SIMILAR_LIMIT = 3;

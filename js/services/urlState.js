@@ -57,7 +57,10 @@ export function buildUrlSearch(state, { fields, defaults }) {
 // 주소창만 바꾸고 페이지는 다시 불러오지 않음 (뒤로가기 기록도 늘리지 않음)
 export function writeUrlState(state, options) {
   const search = buildUrlSearch(state, options);
-  if (search !== window.location.search) {
+  if (search === window.location.search) return;
+  try {
     window.history.replaceState(null, '', `${window.location.pathname}${search}${window.location.hash}`);
+  } catch {
+    // 주소를 바꿀 수 없는 환경(미리보기 창 등)에서는 공유 링크 기능만 생략
   }
 }

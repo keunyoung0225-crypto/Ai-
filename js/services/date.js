@@ -6,6 +6,16 @@ export function isDateString(value) {
   return typeof value === 'string' && DATE_PATTERN.test(value);
 }
 
+// 여러 날짜 표기('20260302', '2026-03-02 10:00', '2026.03.02')를 'YYYY-MM-DD'로. 알 수 없으면 null
+export function toDateString(value) {
+  const text = String(value ?? '').trim();
+  const compact = text.match(/^(\d{4})(\d{2})(\d{2})/);
+  if (compact) return `${compact[1]}-${compact[2]}-${compact[3]}`;
+  const parts = text.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
+  if (!parts) return null;
+  return `${parts[1]}-${parts[2].padStart(2, '0')}-${parts[3].padStart(2, '0')}`;
+}
+
 // 사용자 기기 기준 오늘 날짜
 export function todayString(now = new Date()) {
   const pad = (n) => String(n).padStart(2, '0');

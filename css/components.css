@@ -1,5 +1,6 @@
 /* ---------- 헤더 ---------- */
 .site-header {
+  position: relative;
   background: linear-gradient(135deg, var(--color-header-from), var(--color-header-to));
   color: var(--color-on-primary);
   padding: var(--space-6) var(--space-4);
@@ -12,6 +13,27 @@
   font-size: clamp(26px, 5vw, 38px);
   font-weight: 900;
   letter-spacing: -0.02em;
+}
+
+.site-header__tools {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-4);
+}
+
+.theme-toggle {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-on-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .site-subtitle {
@@ -142,10 +164,123 @@
 /* ---------- 결과 표 ---------- */
 .result-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-3);
   margin-bottom: var(--space-3);
+}
+
+.result-toolbar .result-summary {
+  margin-right: auto;
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip-button {
+  height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip-button:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.chip-button[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.chip-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- 관심공고 별 ---------- */
+.policy-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.favorite-button {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-top: -3px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.favorite-button:hover {
+  background: var(--color-primary-soft);
+}
+
+.favorite-button[aria-pressed="true"] {
+  color: var(--color-star);
+}
+
+/* ---------- 마감 알림 ---------- */
+.deadline-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-alert-border);
+  border-radius: var(--radius-md);
+  background: var(--color-alert-bg);
+}
+
+.deadline-alert[hidden] {
+  display: none;
+}
+
+.deadline-alert__title {
+  color: var(--color-danger);
+}
+
+.deadline-alert__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deadline-alert__link,
+.similar-list__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.deadline-alert__link:hover,
+.similar-list__link:hover {
+  color: var(--color-primary);
 }
 
 .result-summary {
@@ -348,6 +483,7 @@ body:has(.detail-modal[open]) {
 }
 
 .detail-modal__title {
+  flex: 1;
   margin: 0;
   font-size: 20px;
   line-height: 1.4;
@@ -388,6 +524,47 @@ body:has(.detail-modal[open]) {
   color: var(--color-text-muted);
 }
 
+.detail-section {
+  margin-top: var(--space-5);
+}
+
+.detail-section__title {
+  margin: 0 0 var(--space-2);
+  font-size: 15px;
+}
+
+.detail-section__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.similar-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.similar-list li {
+  display: flex;
+  flex-direction: column;
+}
+
+.similar-list__meta {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.detail-modal__header .favorite-button {
+  width: 36px;
+  height: 36px;
+  margin-top: 0;
+  font-size: 22px;
+}
+
 .detail-modal__actions {
   display: flex;
   justify-content: flex-end;
@@ -409,6 +586,10 @@ body:has(.detail-modal[open]) {
 
   .search-form {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-header {
+    padding-top: calc(var(--space-6) + var(--space-4));
   }
 
   .search-actions .btn {
