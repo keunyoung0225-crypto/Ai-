@@ -7,14 +7,14 @@ function createInput(attrs) {
   return input;
 }
 
-// type별 입력칸 생성기. 각 생성기는 { element, read, clear }를 반환합니다.
+// type별 입력칸 생성기. 각 생성기는 { element, read, write }를 반환합니다.
 const fieldBuilders = {
   text(field, id) {
     const input = createInput({ type: 'text', id, name: field.key, placeholder: field.placeholder ?? '' });
     return {
       element: input,
       read: () => input.value,
-      clear: () => (input.value = ''),
+      write: (value) => (input.value = value ?? ''),
     };
   },
 
@@ -28,7 +28,7 @@ const fieldBuilders = {
     return {
       element: select,
       read: () => select.value,
-      clear: () => (select.value = ''),
+      write: (value) => (select.value = value ?? ''),
     };
   },
 
@@ -48,9 +48,9 @@ const fieldBuilders = {
     return {
       element: wrap,
       read: () => ({ from: from.value, to: to.value }),
-      clear: () => {
-        from.value = '';
-        to.value = '';
+      write: (value) => {
+        from.value = value?.from ?? '';
+        to.value = value?.to ?? '';
       },
     };
   },
@@ -96,9 +96,16 @@ export function createSearchForm(container, fields, { options = {}, onSearch, on
   });
 
   resetButton.addEventListener('click', () => {
-    controls.forEach((control) => control.clear());
+    controls.forEach((control) => control.write(null));
     onReset();
   });
 
   container.replaceChildren(form);
+
+  return {
+    // 주소(URL)로 전달된 검색 조건을 입력칸에 채움
+    setValues(filters) {
+      controls.forEach((control) => control.write(filters[control.key]));
+    },
+  };
 }

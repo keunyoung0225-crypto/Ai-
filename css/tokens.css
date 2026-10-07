@@ -13,6 +13,10 @@
   --color-header-to: #1e6fd9;
   --color-on-primary: #ffffff;
   --color-danger: #d93a3a;
+  --color-danger-soft: #fde8e8;
+  --color-closed: #5f6b78;
+  --color-closed-soft: #eef1f4;
+  --color-overlay: rgba(15, 35, 60, 0.45);
 
   --font-sans: 'Noto Sans KR', system-ui, -apple-system, 'Malgun Gothic', sans-serif;
 

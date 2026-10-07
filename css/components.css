@@ -140,9 +140,100 @@
 }
 
 /* ---------- 결과 표 ---------- */
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
 .result-summary {
-  margin: 0 0 var(--space-3);
+  margin: 0;
   font-weight: 700;
+}
+
+/* 정렬 메뉴는 표 머리글이 보이지 않는 모바일에서만 표시 */
+.sort-select {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sort-select__label {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sort-select__input {
+  width: auto;
+  height: 36px;
+}
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sort-button:hover {
+  color: var(--color-primary);
+}
+
+.sort-button__arrow {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+th.is-sorted .sort-button,
+th.is-sorted .sort-button__arrow {
+  color: var(--color-primary);
+}
+
+/* ---------- D-day 배지 ---------- */
+.badge {
+  display: inline-block;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+  vertical-align: 1px;
+}
+
+.badge--urgent {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.badge--open {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.badge--closed {
+  background: var(--color-closed-soft);
+  color: var(--color-closed);
+}
+
+/* ---------- 더보기 ---------- */
+.load-more-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.load-more {
+  margin-top: var(--space-4);
+}
+
+.load-more[hidden] {
+  display: none;
 }
 
 .result-summary strong {
@@ -193,12 +284,19 @@
 
 .policy-title {
   display: block;
+  padding: 0;
+  border: 0;
+  background: none;
   font-weight: 700;
+  text-align: left;
   color: var(--color-text);
+  cursor: pointer;
 }
 
-a.policy-title {
+.policy-title:hover,
+.policy-title:focus-visible {
   color: var(--color-primary);
+  text-decoration: underline;
 }
 
 .policy-summary {
@@ -217,6 +315,92 @@ a.policy-title {
   color: var(--color-danger);
 }
 
+/* ---------- 상세 보기 창 ---------- */
+.detail-modal {
+  width: min(640px, calc(100% - 2 * var(--space-4)));
+  max-height: calc(100% - 2 * var(--space-4));
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 12px 40px rgba(15, 35, 60, 0.25);
+}
+
+.detail-modal::backdrop {
+  background: var(--color-overlay);
+}
+
+body:has(.detail-modal[open]) {
+  overflow: hidden;
+}
+
+.detail-modal__panel {
+  padding: var(--space-5);
+}
+
+.detail-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.detail-modal__title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.detail-modal__close {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.detail-modal__close:hover {
+  background: var(--color-primary-soft);
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: 7em minmax(0, 1fr);
+  margin: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.detail-list dt,
+.detail-list dd {
+  margin: 0;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-list dt {
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.detail-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.detail-modal__actions .btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 /* ---------- 반응형 ---------- */
 @media (max-width: 720px) {
   .card {
@@ -229,5 +413,86 @@ a.policy-title {
 
   .search-actions .btn {
     flex: 1;
+  }
+
+  .sort-select {
+    display: flex;
+  }
+
+  /* 표 → 카드형 목록 */
+  .table-wrap {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .result-table {
+    min-width: 0;
+  }
+
+  .result-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .result-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .result-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .result-table td {
+    display: grid;
+    grid-template-columns: 6em minmax(0, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-1) 0;
+    border: 0;
+  }
+
+  .result-table td::before {
+    content: attr(data-label);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+  }
+
+  .result-table td.is-nowrap {
+    white-space: normal;
+  }
+
+  .result-table td.is-number {
+    text-align: left;
+  }
+
+  /* 공고명·내용을 카드 맨 위에 크게 */
+  .result-table td[data-key="content"] {
+    order: -1;
+    display: block;
+    padding-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .result-table td[data-key="content"]::before {
+    content: none;
+  }
+
+  .detail-modal__panel {
+    padding: var(--space-4);
+  }
+
+  .detail-list {
+    grid-template-columns: 6.5em minmax(0, 1fr);
   }
 }

@@ -1,27 +1,21 @@
 // 결과 표: config의 COLUMNS로 머리글과 행을 자동 생성
+// 모바일(좁은 화면)에서는 CSS가 각 행을 카드 형태로 바꿔 보여줍니다. (td의 data-label 사용)
 import { formatValue } from '../services/format.js';
+import { createDeadlineBadge } from './deadlineBadge.js';
 
-function isSafeUrl(url) {
-  try {
-    return ['http:', 'https:'].includes(new URL(url, window.location.href).protocol);
-  } catch {
-    return false;
-  }
-}
+const ARIA_SORT = { asc: 'ascending', desc: 'descending' };
+const SORT_ARROW = { asc: '▲', desc: '▼' };
 
 // 특수한 칸 그리기 방식 (열 정의의 render 이름으로 선택)
 const cellRenderers = {
-  // 공고명(굵게) + 사업 요약
-  titleWithSummary(policy) {
+  // 공고명(누르면 상세 보기) + 사업 요약
+  titleWithSummary(policy, column, { onOpenDetail }) {
     const fragment = document.createDocumentFragment();
-    const title = document.createElement(policy.url && isSafeUrl(policy.url) ? 'a' : 'span');
+    const title = document.createElement('button');
+    title.type = 'button';
     title.className = 'policy-title';
     title.textContent = policy.title ?? '-';
-    if (title.tagName === 'A') {
-      title.href = policy.url;
-      title.target = '_blank';
-      title.rel = 'noopener noreferrer';
-    }
+    title.addEventListener('click', () => onOpenDetail(policy.id));
     fragment.append(title);
 
     if (policy.content) {
@@ -30,6 +24,15 @@ const cellRenderers = {
       summary.textContent = policy.content;
       fragment.append(summary);
     }
+    return fragment;
+  },
+
+  // 마감일 + D-day 배지
+  deadlineWithBadge(policy, column, { deadlineWarningDays }) {
+    const fragment = document.createDocumentFragment();
+    fragment.append(formatValue(policy[column.key], column.format));
+    const badge = createDeadlineBadge(policy[column.key], deadlineWarningDays);
+    if (badge) fragment.append(' ', badge);
     return fragment;
   },
 };
@@ -41,21 +44,35 @@ function createMessage(text, isError = false) {
   return message;
 }
 
-export function createResultTable(container, columns) {
-  const summary = document.createElement('p');
-  summary.className = 'result-summary';
-  summary.setAttribute('aria-live', 'polite');
+// summary: '검색결과 N건'을 표시할 요소
+export function createResultTable(container, columns, { summary, onSort, onOpenDetail, deadlineWarningDays }) {
+  const context = { onOpenDetail, deadlineWarningDays };
 
   const table = document.createElement('table');
   table.className = 'result-table';
   const caption = document.createElement('caption');
   caption.className = 'visually-hidden';
   caption.textContent = '정책 공고 검색 결과';
+
   const headRow = document.createElement('tr');
+  const sortHeaders = [];
   columns.forEach((column) => {
     const th = document.createElement('th');
     th.scope = 'col';
-    th.textContent = column.label;
+    if (column.sort) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sort-button';
+      const arrow = document.createElement('span');
+      arrow.className = 'sort-button__arrow';
+      arrow.setAttribute('aria-hidden', 'true');
+      button.append(column.label, arrow);
+      button.addEventListener('click', () => onSort(column.key));
+      th.append(button);
+      sortHeaders.push({ key: column.key, th, arrow });
+    } else {
+      th.textContent = column.label;
+    }
     headRow.append(th);
   });
   const thead = document.createElement('thead');
@@ -68,24 +85,38 @@ export function createResultTable(container, columns) {
   tableWrap.append(table);
 
   const body = document.createElement('div');
-  container.replaceChildren(summary, body);
+  container.replaceChildren(body);
 
   function renderRow(policy) {
     const row = document.createElement('tr');
     columns.forEach((column) => {
       const td = document.createElement('td');
+      td.dataset.label = column.label;
+      td.dataset.key = column.key;
       if (column.nowrap) td.classList.add('is-nowrap');
       if (column.align === 'number') td.classList.add('is-number');
 
+      // 칸 내용을 하나의 요소로 감싸 모바일 카드(2열 그리드)에서도 한 덩어리로 배치
+      const cell = document.createElement('div');
       const renderer = cellRenderers[column.render];
       if (renderer) {
-        td.append(renderer(policy));
+        cell.append(renderer(policy, column, context));
       } else {
-        td.textContent = formatValue(policy[column.key], column.format);
+        cell.textContent = formatValue(policy[column.key], column.format);
       }
+      td.append(cell);
       row.append(td);
     });
     return row;
+  }
+
+  function renderSortState(sort) {
+    sortHeaders.forEach(({ key, th, arrow }) => {
+      const active = key === sort.key;
+      th.setAttribute('aria-sort', active ? ARIA_SORT[sort.dir] : 'none');
+      th.classList.toggle('is-sorted', active);
+      arrow.textContent = active ? SORT_ARROW[sort.dir] : '↕';
+    });
   }
 
   return {
@@ -99,18 +130,25 @@ export function createResultTable(container, columns) {
       body.replaceChildren(createMessage(text, true));
     },
 
-    render(policies) {
+    // policies: 화면에 보여줄 공고, total: 검색된 전체 건수
+    render(policies, { total, sort }) {
       summary.replaceChildren('검색결과 ');
       const count = document.createElement('strong');
-      count.textContent = policies.length.toLocaleString('ko-KR');
+      count.textContent = total.toLocaleString('ko-KR');
       summary.append(count, '건');
 
-      if (!policies.length) {
+      if (!total) {
         body.replaceChildren(createMessage('조건에 맞는 공고가 없습니다. 검색 조건을 바꿔 보세요.'));
         return;
       }
+      renderSortState(sort);
       tbody.replaceChildren(...policies.map(renderRow));
       body.replaceChildren(tableWrap);
+    },
+
+    // '더보기' 후 새로 나타난 첫 공고로 키보드 초점 이동
+    focusRow(index) {
+      tbody.rows[index]?.querySelector('button, a')?.focus();
     },
   };
 }

@@ -25,15 +25,57 @@ export const SEARCH_FIELDS = [
   { key: 'period', label: '사업기간', type: 'dateRange' },
 ];
 
-// 결과 표 열(첫 줄 제목). format: 'date' | 'range' | 'money', render: 'titleWithSummary'
+// 결과 표 열(첫 줄 제목).
+// - format: 'date' | 'range' | 'money'
+// - render: 'titleWithSummary'(공고명+요약, 누르면 상세 보기) | 'deadlineWithBadge'(마감일+D-day 배지)
+// - sort: 머리글 클릭 정렬 설정. defaultDir은 처음 눌렀을 때의 방향, labels는 모바일 정렬 메뉴 문구,
+//         pastLast: true면 오늘 이전 날짜(이미 마감된 공고)를 방향과 관계없이 맨 뒤로
 export const COLUMNS = [
-  { key: 'announceDate', label: '공고일', format: 'date', nowrap: true },
+  {
+    key: 'announceDate',
+    label: '공고일',
+    format: 'date',
+    nowrap: true,
+    sort: { defaultDir: 'desc', labels: { desc: '최신순', asc: '오래된순' } },
+  },
   { key: 'agency', label: '주체기관', nowrap: true },
   { key: 'period', label: '사업기간', format: 'range', nowrap: true },
   { key: 'content', label: '정책사업내용', render: 'titleWithSummary' },
-  { key: 'budget', label: '예산', format: 'money', nowrap: true, align: 'number' },
-  { key: 'deadline', label: '지원마감일', format: 'date', nowrap: true },
+  {
+    key: 'budget',
+    label: '예산',
+    format: 'money',
+    nowrap: true,
+    align: 'number',
+    sort: { defaultDir: 'desc', labels: { desc: '많은순', asc: '적은순' } },
+  },
+  {
+    key: 'deadline',
+    label: '지원마감일',
+    format: 'date',
+    render: 'deadlineWithBadge',
+    nowrap: true,
+    sort: { defaultDir: 'asc', pastLast: true, labels: { asc: '임박순', desc: '늦은순' } },
+  },
+];
+
+// 상세 보기 창에 표시할 항목 (format: 'category'는 검색유형 이름으로 표시)
+export const DETAIL_FIELDS = [
+  { key: 'category', label: '검색유형', format: 'category' },
+  { key: 'agency', label: '주체기관' },
+  { key: 'announceDate', label: '공고일', format: 'date' },
+  { key: 'period', label: '사업기간', format: 'range' },
+  { key: 'budget', label: '예산', format: 'money' },
+  { key: 'deadline', label: '지원마감일', format: 'date' },
+  { key: 'target', label: '지원대상' },
+  { key: 'content', label: '정책사업내용' },
 ];
 
 // 기본 정렬: 최신 공고가 위로
 export const DEFAULT_SORT = { key: 'announceDate', dir: 'desc' };
+
+// 한 번에 보여줄 공고 수 ('더보기'를 누르면 이만큼 더 표시)
+export const PAGE_SIZE = 10;
+
+// 마감 임박으로 강조할 기준(일)
+export const DEADLINE_WARNING_DAYS = 7;

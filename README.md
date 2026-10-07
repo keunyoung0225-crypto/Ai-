@@ -8,6 +8,13 @@
 - **결과 표**: 공고일 · 주체기관 · 사업기간 · 정책사업내용 · 예산 · 지원마감일
   - 정책사업내용 칸에 공고명(굵게)과 사업 요약을 함께 표시
   - 예산은 `12억 5,000만원` 형식으로 표시
+- **정렬**: 공고일·예산·지원마감일 머리글 클릭 (모바일은 정렬 메뉴)
+  - 지원마감일 정렬 시 이미 마감된 공고는 항상 맨 뒤
+- **더보기**: 10건씩 나눠 표시
+- **상세 보기**: 공고명을 누르면 지원대상 등 전체 정보 표시
+- **D-day 배지**: 마감 7일 이내는 빨간색, 지난 공고는 `마감`
+- **링크 공유**: 검색 조건·정렬·열어 둔 공고가 주소(URL)에 저장되어 그대로 공유 가능
+- **모바일**: 좁은 화면에서는 표가 카드형 목록으로 바뀜
 
 > 현재 공고 데이터(`data/policies.json`)는 **시연용 가상 데이터**입니다.
 
@@ -38,7 +45,9 @@ js/data/repository.js   데이터 조회 창구
 js/data/sources/        데이터 출처 (jsonSource: 샘플, apiSource: API 연동 자리)
 js/services/filter.js   검색·정렬 로직
 js/services/format.js   날짜·예산 표시 형식
-js/components/          헤더, 카테고리 버튼, 검색 폼, 결과 표
+js/services/date.js     D-day 계산
+js/services/urlState.js 검색 상태 ↔ URL 주소 변환
+js/components/          헤더, 카테고리 버튼, 검색 폼, 결과 표, 정렬 메뉴, 더보기, 상세 보기 창
 data/policies.json      공고 데이터
 ```
 
@@ -47,7 +56,10 @@ data/policies.json      공고 데이터
 |---|---|
 | 카테고리 추가 | `js/config.js`의 `CATEGORIES`에 한 줄 추가 + 데이터 `category` 값 맞추기 |
 | 표 열 추가·순서 변경 | `js/config.js`의 `COLUMNS` |
-| 검색 조건 추가 | `js/config.js`의 `SEARCH_FIELDS` (`text` / `select` / `dateRange`) |
+| 검색 조건 추가 | `js/config.js`의 `SEARCH_FIELDS` (`text` / `select` / `dateRange`) — URL 공유도 자동 적용 |
+| 정렬 가능한 열 추가 | `js/config.js`의 `COLUMNS` 항목에 `sort` 추가 |
+| 상세 보기 항목 변경 | `js/config.js`의 `DETAIL_FIELDS` |
+| 한 번에 보이는 건수, 마감 임박 기준 | `js/config.js`의 `PAGE_SIZE`, `DEADLINE_WARNING_DAYS` |
 | 색상 변경 | `css/tokens.css` |
 | 공공 API 연동 | `js/data/sources/apiSource.js` 구현 후 `config.js`의 `DATA_SOURCE`를 `'api'`로 |
 

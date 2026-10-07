@@ -36,9 +36,14 @@ function sortValue(value) {
   return value && typeof value === 'object' ? value.start : value;
 }
 
-export function sortPolicies(policies, { key, dir }) {
+// options.isLast(policy)가 true인 공고는 정렬 방향과 관계없이 맨 뒤로 보냄
+export function sortPolicies(policies, { key, dir }, { isLast } = {}) {
   const sign = dir === 'desc' ? -1 : 1;
   return [...policies].sort((a, b) => {
+    if (isLast) {
+      const aLast = isLast(a);
+      if (aLast !== isLast(b)) return aLast ? 1 : -1;
+    }
     const left = sortValue(a[key]);
     const right = sortValue(b[key]);
     if (left == null) return 1;
