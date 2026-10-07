@@ -16,6 +16,7 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
   const frame = document.createElement('div');
   frame.className = 'ad-slot__frame';
   frame.style.setProperty('--ad-width', `${slot.width}px`);
+  frame.style.setProperty('--ad-ratio', `${slot.width} / ${slot.height}`);
 
   // 광고임을 알리는 표시
   const tag = document.createElement('span');
@@ -47,7 +48,9 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
     placeholder.append(title, sizeText);
     frame.append(placeholder);
   }
-  frame.append(tag);
+  // labelOutside: 이미지 글자를 가리지 않도록 '광고' 표시를 틀 바깥(왼쪽)에 둠
+  if (slot.labelOutside) tag.classList.add('ad-slot__tag--outside');
+  else frame.append(tag);
 
   // ---------- 세로 높이 ----------
   const min = slot.minHeight ?? slot.height;
@@ -60,7 +63,7 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
   let preferred = Number.isFinite(saved) && saved > 0 ? saved : slot.height;
   let height = clamp(preferred);
 
-  const children = [frame];
+  const children = slot.labelOutside ? [tag, frame] : [frame];
   let handle = null;
 
   function applyHeight(next, { save = false, remember = true } = {}) {
