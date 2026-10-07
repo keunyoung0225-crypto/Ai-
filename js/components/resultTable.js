@@ -2,6 +2,7 @@
 // 모바일(좁은 화면)에서는 CSS가 각 행을 카드 형태로 바꿔 보여줍니다. (td의 data-label 사용)
 import { formatValue } from '../services/format.js';
 import { daysUntil, isDateString } from '../services/date.js';
+import { displayHost, isSafeUrl } from '../services/links.js';
 import { createDeadlineBadge } from './deadlineBadge.js';
 import { createFavoriteButton, setFavoriteState } from './favoriteButton.js';
 
@@ -38,6 +39,27 @@ const cellRenderers = {
       summary.className = 'policy-summary';
       summary.textContent = policy.content;
       fragment.append(summary);
+    }
+
+    // 신청 페이지 링크 (사이트 주소를 함께 표시, 새 창으로 열림)
+    if (policy.applyUrl && isSafeUrl(policy.applyUrl)) {
+      const link = document.createElement('a');
+      link.className = 'apply-link';
+      link.href = policy.applyUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.title = policy.applyUrl;
+      link.setAttribute('aria-label', `${policy.title} 신청 페이지 (${displayHost(policy.applyUrl)}, 새 창)`);
+      const label = document.createElement('strong');
+      label.textContent = '신청하기';
+      const host = document.createElement('span');
+      host.className = 'apply-link__host';
+      host.textContent = displayHost(policy.applyUrl);
+      const mark = document.createElement('span');
+      mark.setAttribute('aria-hidden', 'true');
+      mark.textContent = '↗';
+      link.append(label, host, mark);
+      fragment.append(link);
     }
     return fragment;
   },

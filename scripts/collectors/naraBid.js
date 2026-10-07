@@ -76,5 +76,7 @@ export async function collectNaraBid(source, env, { today }) {
       budget: item.asignBdgtAmt || item.presmptPrce || null,
       deadline: item.bidClseDt,
       url: item.bidNtceDtlUrl ?? item.bidNtceUrl,
+      // 나라장터 공고는 상세 페이지에서 견적·입찰에 참여
+      applyUrl: item.bidNtceDtlUrl ?? item.bidNtceUrl,
     }));
 }

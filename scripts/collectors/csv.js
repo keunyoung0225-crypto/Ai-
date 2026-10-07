@@ -20,7 +20,8 @@ const COLUMN_ALIASES = {
   target: ['지원대상', 'target'],
   budget: ['예산(원)', '예산', 'budget'],
   deadline: ['지원마감일', '마감일', 'deadline'],
-  url: ['공고URL', '원문', 'url'],
+  url: ['공고URL', '공고원문', '원문', 'url'],
+  applyUrl: ['신청URL', '신청페이지', '신청링크', 'applyUrl'],
 };
 
 const squash = (text) => String(text).replace(/\s+/g, '').toLowerCase();
@@ -104,6 +105,7 @@ export async function collectCsv(source, env, { root, log }) {
       budget: parseAmount(row.budget),
       deadline: row.deadline,
       url: row.url || undefined,
+      applyUrl: row.applyUrl || undefined,
     });
   });
   if (skipped) log(`  공고명이 비어 있는 줄 ${skipped}개는 건너뛰었습니다.`);

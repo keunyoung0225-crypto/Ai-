@@ -91,6 +91,9 @@ export const DETAIL_FIELDS = [
   { key: 'deadline', label: '지원마감일', format: 'date' },
   { key: 'target', label: '지원대상' },
   { key: 'content', label: '정책사업내용' },
+  // format: 'link'는 주소를 그대로 보여주고 누르면 새 창으로 열림. empty는 주소가 없을 때 안내 문구
+  { key: 'applyUrl', label: '신청 페이지', format: 'link', empty: '주체기관 누리집의 공고문에서 신청 방법을 확인하세요.' },
+  { key: 'url', label: '공고 원문', format: 'link' },
 ];
 
 // 기본 정렬: 최신 공고가 위로
@@ -139,6 +142,8 @@ export const EXPORT_FIELDS = [
   { key: 'target', label: '지원대상' },
   { key: 'budget', label: '예산(원)' },
   { key: 'deadline', label: '지원마감일' },
+  { key: 'applyUrl', label: '신청URL' },
+  { key: 'url', label: '공고URL' },
 ];
 
 // 상세 보기의 '비슷한 공고' 추천: 'rule'(규칙 기반) | 'ai'(AI 서버 연결 후 사용)
