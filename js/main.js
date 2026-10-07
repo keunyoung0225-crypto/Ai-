@@ -13,6 +13,7 @@ import {
   DETAIL_FIELDS,
   EXPORT_FIELDS,
   PAGE_SIZE,
+  RECENT_SEARCH_LIMIT,
   RECOMMENDER,
   SEARCH_FIELDS,
   NEW_BADGE_DAYS,
@@ -22,7 +23,8 @@ import {
 } from './config.js';
 import { createStore, createEmptyFilters } from './state.js';
 import { createRepository } from './data/repository.js';
-import { filterPolicies, sortPolicies, uniqueValues } from './services/filter.js';
+import { filterPolicies, matchesKeyword, sortPolicies, uniqueValues } from './services/filter.js';
+import { readValue, writeValue } from './services/storage.js';
 import { readUrlState, writeUrlState } from './services/urlState.js';
 import { deadlineStatus, isDateString, todayString } from './services/date.js';
 import { formatDate } from './services/format.js';
@@ -41,6 +43,7 @@ import { createDetailModal } from './components/detailModal.js';
 import { createDeadlineAlert } from './components/deadlineAlert.js';
 import { createNotifySettings } from './components/notifySettings.js';
 import { renderSummaryStats } from './components/summaryStats.js';
+import { createRecentSearch } from './components/recentSearch.js';
 
 const URL_OPTIONS = {
   categories: CATEGORIES,
@@ -212,7 +215,51 @@ async function init() {
     onOpen: (id) => store.set({ detailId: id }),
   });
 
+  // 최근 검색 공고: 마지막으로 검색한 키워드를 기억했다가, 키워드칸이 비어 있을 때 맞는 공고를 보여줌
+  // 접수 중인 공고를 먼저, 그다음 최신 공고일 순
+  let recentKeyword = readValue(STORAGE_KEYS.recentKeyword) ?? '';
+  const today = todayString();
+  const recentMatches = (keyword) =>
+    policies
+      .filter((policy) => matchesKeyword(policy, keyword, keywordField.fields))
+      .sort(
+        (a, b) =>
+          Number((a.deadline ?? '9999') < today) - Number((b.deadline ?? '9999') < today) ||
+          (b.announceDate ?? '').localeCompare(a.announceDate ?? ''),
+      );
+
+  const recentSearch = createRecentSearch(document.getElementById('recent-search'), {
+    deadlineWarningDays: DEADLINE_WARNING_DAYS,
+    onOpen: (id) => store.set({ detailId: id }),
+    onApply: (keyword) => {
+      const filters = { ...createEmptyFilters(SEARCH_FIELDS), [keywordField.key]: keyword };
+      searchForm.setValues(filters);
+      store.set({ filters, visibleCount: PAGE_SIZE });
+      document.getElementById('results').focus();
+    },
+    onClear: () => {
+      recentKeyword = '';
+      writeValue(STORAGE_KEYS.recentKeyword, null);
+      renderRecent(store.get());
+    },
+  });
+
+  function renderRecent(state) {
+    const current = keywordField ? state.filters[keywordField.key]?.trim() : '';
+    if (!keywordField || !recentKeyword || current) {
+      recentSearch.render({ keyword: '' });
+      return;
+    }
+    const matches = recentMatches(recentKeyword);
+    recentSearch.render({
+      keyword: recentKeyword,
+      items: matches.slice(0, RECENT_SEARCH_LIMIT),
+      total: matches.length,
+    });
+  }
+
   let prev = null;
+  let prevFilters = null;
   const update = (state) => {
     const favorites = new Set(state.favorites);
     const favoritesChanged = !prev || prev.favorites !== state.favorites;
@@ -263,6 +310,17 @@ async function init() {
       favoriteCount: favorites.size,
       resultCount: currentResults.length,
     });
+
+    // 키워드로 검색하면 그 키워드를 기억
+    if (prevFilters !== state.filters) {
+      const keyword = keywordField ? state.filters[keywordField.key]?.trim() : '';
+      if (keyword && keyword !== recentKeyword) {
+        recentKeyword = keyword;
+        writeValue(STORAGE_KEYS.recentKeyword, keyword);
+      }
+      prevFilters = state.filters;
+      renderRecent(state);
+    }
 
     if (favoritesChanged) {
       saveFavorites(STORAGE_KEYS.favorites, state.favorites);

@@ -111,7 +111,11 @@ export const STORAGE_KEYS = {
   favorites: 'policyMoa.favorites',
   theme: 'policyMoa.theme',
   notify: 'policyMoa.notify',
+  recentKeyword: 'policyMoa.recentKeyword',
 };
+
+// '최근 검색 공고'에 보여줄 공고 수 (마지막으로 검색한 키워드 기준)
+export const RECENT_SEARCH_LIMIT = 3;
 
 // 휴대폰 알림 (무료 앱 ntfy 사용). 매일 아침 GitHub Actions가 scripts/notify.mjs를 실행해 발송합니다.
 // - sendTime: 알림이 도착할 한국 시각. 작업은 그보다 먼저 실행되고 ntfy 예약 발송으로 이 시각에 도착합니다.
