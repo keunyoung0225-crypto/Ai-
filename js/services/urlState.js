@@ -6,7 +6,7 @@ import { isDateString } from './date.js';
 
 const SORT_DIRS = ['asc', 'desc'];
 
-export function readUrlState(search, { categories, fields, columns, defaults }) {
+export function readUrlState(search, { categories, fields, columns, regions = [], defaults }) {
   const params = new URLSearchParams(search);
 
   const category = params.get('cat');
@@ -21,11 +21,13 @@ export function readUrlState(search, { categories, fields, columns, defaults }) 
     }
   });
 
+  const region = params.get('region');
   const [sortKey, sortDir] = (params.get('sort') ?? '').split(':');
   const sortable = columns.some((column) => column.key === sortKey && column.sort);
 
   return {
     category: categories.some((c) => c.id === category) ? category : defaults.category,
+    region: regions.some((r) => r.id === region) ? region : '',
     filters,
     sort: sortable && SORT_DIRS.includes(sortDir) ? { key: sortKey, dir: sortDir } : defaults.sort,
     detailId: params.get('id') || null,
@@ -36,6 +38,7 @@ export function buildUrlSearch(state, { fields, defaults }) {
   const params = new URLSearchParams();
 
   if (state.category !== defaults.category) params.set('cat', state.category);
+  if (state.region) params.set('region', state.region);
   fields.forEach(({ key, type }) => {
     const value = state.filters[key];
     if (type === 'dateRange') {

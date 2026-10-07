@@ -3,6 +3,7 @@ import { formatValue } from '../services/format.js';
 import { createDeadlineBadge } from './deadlineBadge.js';
 import { createFavoriteButton, setFavoriteState } from './favoriteButton.js';
 import { displayUrl, isSafeUrl } from '../services/links.js';
+import { regionLabel } from '../services/regions.js';
 
 // 새 창으로 여는 외부 링크
 function createExternalLink(url, text, className) {
@@ -54,6 +55,7 @@ export function createDetailModal(
 
   function displayValue(policy, field) {
     if (field.format === 'category') return categoryLabels[policy.category] ?? '-';
+    if (field.format === 'region') return regionLabel(policy.region) || '-';
     return formatValue(policy[field.key], field.format);
   }
 

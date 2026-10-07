@@ -27,6 +27,30 @@ export const CATEGORIES = [
   { id: 'entrusted', label: '위수탁지원사업' },
 ];
 
+// 지역(시·도). 지도에서 눌러 고르면 그 지역 공고만 보여 줍니다.
+// - names: 기관 이름 등에서 지역을 알아낼 때 쓰는 이름 (긴 이름을 먼저 적음)
+// - point: 지도 위에 공고 수를 표시할 위치 (지도 좌표, 가로·세로)
+// - name: 지도에 지역 이름을 쓸 위치 (넓은 도 지역만. 'below'는 숫자 아래, 'right'는 숫자 오른쪽)
+export const REGIONS = [
+  { id: 'seoul', label: '서울', names: ['서울특별시', '서울시', '서울'], point: [152, 127] },
+  { id: 'busan', label: '부산', names: ['부산광역시', '부산시', '부산'], point: [345, 400] },
+  { id: 'daegu', label: '대구', names: ['대구광역시', '대구시', '대구'], point: [300, 336] },
+  { id: 'incheon', label: '인천', names: ['인천광역시', '인천시', '인천'], point: [112, 142] },
+  { id: 'gwangju', label: '광주', names: ['광주광역시', '광주'], point: [140, 408] },
+  { id: 'daejeon', label: '대전', names: ['대전광역시', '대전시', '대전'], point: [198, 282] },
+  { id: 'ulsan', label: '울산', names: ['울산광역시', '울산시', '울산'], point: [366, 364] },
+  { id: 'sejong', label: '세종', names: ['세종특별자치시', '세종시', '세종'], point: [170, 240] },
+  { id: 'gyeonggi', label: '경기', names: ['경기도', '경기'], point: [182, 172], name: 'below' },
+  { id: 'gangwon', label: '강원', names: ['강원특별자치도', '강원도', '강원'], point: [290, 105], name: 'below' },
+  { id: 'chungbuk', label: '충북', names: ['충청북도', '충북'], point: [252, 222], name: 'below' },
+  { id: 'chungnam', label: '충남', names: ['충청남도', '충남'], point: [122, 258], name: 'below' },
+  { id: 'jeonbuk', label: '전북', names: ['전북특별자치도', '전라북도', '전북'], point: [165, 338], name: 'below' },
+  { id: 'jeonnam', label: '전남', names: ['전라남도', '전남'], point: [128, 458], name: 'below' },
+  { id: 'gyeongbuk', label: '경북', names: ['경상북도', '경북'], point: [330, 258], name: 'below' },
+  { id: 'gyeongnam', label: '경남', names: ['경상남도', '경남'], point: [262, 398], name: 'below' },
+  { id: 'jeju', label: '제주', names: ['제주특별자치도', '제주도', '제주'], point: [112, 609], name: 'right' },
+];
+
 // 검색 조건. type: 'keyword' | 'text' | 'select' | 'dateRange'
 // - keyword는 fields에 적은 여러 항목을 한꺼번에 검색합니다. (띄어쓰기로 여러 단어 → 모두 포함된 공고)
 // - wide: true면 검색 폼에서 한 줄 전체를 차지합니다.
@@ -60,7 +84,7 @@ export const COLUMNS = [
     nowrap: true,
     sort: { defaultDir: 'desc', labels: { desc: '최신순', asc: '오래된순' } },
   },
-  { key: 'agency', label: '주체기관', nowrap: true },
+  { key: 'agency', label: '주체기관', render: 'agencyWithRegion', nowrap: true },
   { key: 'period', label: '사업기간', format: 'range', nowrap: true },
   { key: 'content', label: '정책사업내용', render: 'titleWithSummary' },
   {
@@ -84,6 +108,7 @@ export const COLUMNS = [
 // 상세 보기 창에 표시할 항목 (format: 'category'는 검색유형 이름으로 표시)
 export const DETAIL_FIELDS = [
   { key: 'category', label: '검색유형', format: 'category' },
+  { key: 'region', label: '지역', format: 'region' },
   { key: 'agency', label: '주체기관' },
   { key: 'announceDate', label: '공고일', format: 'date' },
   { key: 'period', label: '사업기간', format: 'range' },
@@ -136,6 +161,7 @@ export const EXPORT_FIELDS = [
   { key: 'title', label: '공고명' },
   { key: 'category', label: '검색유형', format: 'category' },
   { key: 'announceDate', label: '공고일' },
+  { key: 'region', label: '지역', format: 'region' },
   { key: 'agency', label: '주체기관' },
   { key: 'period', label: '사업기간', format: 'range' },
   { key: 'content', label: '정책사업내용' },

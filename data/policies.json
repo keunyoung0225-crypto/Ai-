@@ -15,7 +15,8 @@
     "budget": 48000000,
     "deadline": "2026-01-22",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gyeonggi"
   },
   {
     "id": "2026-C-002",
@@ -33,7 +34,8 @@
     "budget": 19800000,
     "deadline": "2026-03-16",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gangwon"
   },
   {
     "id": "2026-C-003",
@@ -51,7 +53,8 @@
     "budget": 35000000,
     "deadline": "2026-04-30",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "seoul"
   },
   {
     "id": "2026-C-004",
@@ -69,7 +72,8 @@
     "budget": 22000000,
     "deadline": "2026-06-12",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gyeonggi"
   },
   {
     "id": "2026-C-005",
@@ -87,7 +91,8 @@
     "budget": 45500000,
     "deadline": "2026-07-24",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gangwon"
   },
   {
     "id": "2026-C-006",
@@ -105,7 +110,8 @@
     "budget": 49000000,
     "deadline": "2026-09-18",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "seoul"
   },
   {
     "id": "2026-C-007",
@@ -123,7 +129,8 @@
     "budget": 27000000,
     "deadline": "2026-10-20",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "jeonnam"
   },
   {
     "id": "2026-C-008",
@@ -141,7 +148,8 @@
     "budget": 30000000,
     "deadline": "2026-10-15",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gyeonggi"
   },
   {
     "id": "2026-E-001",
@@ -158,7 +166,8 @@
     "budget": 1200000000,
     "deadline": "2026-02-10",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "jeonnam"
   },
   {
     "id": "2026-E-002",
@@ -175,7 +184,8 @@
     "budget": 850000000,
     "deadline": "2026-03-06",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gyeonggi"
   },
   {
     "id": "2026-E-003",
@@ -192,7 +202,8 @@
     "budget": 2300000000,
     "deadline": "2026-04-10",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gangwon"
   },
   {
     "id": "2026-E-004",
@@ -209,7 +220,8 @@
     "budget": 640000000,
     "deadline": "2026-05-29",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "seoul"
   },
   {
     "id": "2026-E-005",
@@ -226,7 +238,8 @@
     "budget": 1500000000,
     "deadline": "2026-07-10",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "jeonnam"
   },
   {
     "id": "2026-E-006",
@@ -243,7 +256,8 @@
     "budget": 380000000,
     "deadline": "2026-09-04",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gyeonggi"
   },
   {
     "id": "2026-E-007",
@@ -260,7 +274,8 @@
     "budget": 1050000000,
     "deadline": "2026-10-16",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "gangwon"
   },
   {
     "id": "2026-E-008",
@@ -277,6 +292,248 @@
     "budget": 720000000,
     "deadline": "2026-10-26",
     "tags": [],
-    "source": "sample"
+    "source": "sample",
+    "region": "seoul"
+  },
+  {
+    "id": "2026-R-001",
+    "category": "contract",
+    "title": "해수욕장 안전요원 교육 용역 수의계약 공고",
+    "announceDate": "2026-09-24",
+    "agency": "바다구청",
+    "period": {
+      "start": "2026-11-01",
+      "end": "2026-12-20"
+    },
+    "content": "여름철 해수욕장 안전요원 응급처치·수상구조 교육",
+    "target": "교육·훈련 전문 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 38000000,
+    "deadline": "2026-10-14",
+    "tags": [],
+    "source": "sample",
+    "region": "busan"
+  },
+  {
+    "id": "2026-R-002",
+    "category": "entrusted",
+    "title": "2027년 청년창업 공유오피스 위탁운영 기관 모집",
+    "announceDate": "2026-09-30",
+    "agency": "달빛구청",
+    "period": {
+      "start": "2027-01-01",
+      "end": "2028-12-31"
+    },
+    "content": "청년 창업자 공유오피스 운영 및 창업 교육 프로그램",
+    "target": "창업지원 경험이 있는 법인",
+    "budget": 520000000,
+    "deadline": "2026-10-23",
+    "tags": [],
+    "source": "sample",
+    "region": "daegu"
+  },
+  {
+    "id": "2026-R-003",
+    "category": "contract",
+    "title": "도서 지역 순회 진료 차량 정비 수의계약 공고",
+    "announceDate": "2026-10-02",
+    "agency": "섬마루구청",
+    "period": {
+      "start": "2026-11-01",
+      "end": "2026-12-31"
+    },
+    "content": "순회 진료 차량 정기 정비 및 소모품 교체",
+    "target": "자동차 정비업 등록 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 21000000,
+    "deadline": "2026-10-13",
+    "tags": [],
+    "source": "sample",
+    "region": "incheon"
+  },
+  {
+    "id": "2026-R-004",
+    "category": "entrusted",
+    "title": "장애인 문화예술센터 위탁운영 법인 공모",
+    "announceDate": "2026-09-18",
+    "agency": "빛고을구청",
+    "period": {
+      "start": "2027-01-01",
+      "end": "2029-12-31"
+    },
+    "content": "장애인 문화예술 교육·공연 프로그램 및 센터 운영",
+    "target": "장애인 복지 관련 비영리법인",
+    "budget": 690000000,
+    "deadline": "2026-10-17",
+    "tags": [],
+    "source": "sample",
+    "region": "gwangju"
+  },
+  {
+    "id": "2026-R-005",
+    "category": "contract",
+    "title": "과학관 전시물 유지보수 수의계약 공고",
+    "announceDate": "2026-10-05",
+    "agency": "한밭구청",
+    "period": {
+      "start": "2026-11-01",
+      "end": "2027-02-28"
+    },
+    "content": "어린이 과학 체험 전시물 점검·수리",
+    "target": "전시물 제작·수리 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 44000000,
+    "deadline": "2026-10-19",
+    "tags": [],
+    "source": "sample",
+    "region": "daejeon"
+  },
+  {
+    "id": "2026-R-006",
+    "category": "entrusted",
+    "title": "산업단지 근로자 건강센터 위탁운영 기관 모집",
+    "announceDate": "2026-09-25",
+    "agency": "고래구청",
+    "period": {
+      "start": "2027-01-01",
+      "end": "2028-12-31"
+    },
+    "content": "근로자 건강상담·직업병 예방 프로그램 운영",
+    "target": "보건의료 관련 법인",
+    "budget": 810000000,
+    "deadline": "2026-10-28",
+    "tags": [],
+    "source": "sample",
+    "region": "ulsan"
+  },
+  {
+    "id": "2026-R-007",
+    "category": "contract",
+    "title": "행정복지센터 회의실 영상장비 구매 수의계약",
+    "announceDate": "2026-10-06",
+    "agency": "누리동 행정복지센터",
+    "period": {
+      "start": "2026-10-20",
+      "end": "2026-11-30"
+    },
+    "content": "회의실 화상회의 장비 구매 및 설치",
+    "target": "영상장비 판매·설치 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 27500000,
+    "deadline": "2026-10-16",
+    "tags": [],
+    "source": "sample",
+    "region": "sejong"
+  },
+  {
+    "id": "2026-R-008",
+    "category": "entrusted",
+    "title": "농촌 공동아이돌봄센터 위탁운영 공모",
+    "announceDate": "2026-09-29",
+    "agency": "청솔군청",
+    "period": {
+      "start": "2027-01-01",
+      "end": "2028-12-31"
+    },
+    "content": "농촌 지역 초등학생 방과후 돌봄 운영",
+    "target": "아동 돌봄 관련 비영리법인",
+    "budget": 360000000,
+    "deadline": "2026-10-21",
+    "tags": [],
+    "source": "sample",
+    "region": "chungbuk"
+  },
+  {
+    "id": "2026-R-009",
+    "category": "contract",
+    "title": "갯벌 생태체험장 안내판 제작 수의계약",
+    "announceDate": "2026-10-01",
+    "agency": "갯벌군청",
+    "period": {
+      "start": "2026-10-25",
+      "end": "2026-12-15"
+    },
+    "content": "생태체험장 안내판·표지판 디자인 및 설치",
+    "target": "옥외광고물 제작 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 18500000,
+    "deadline": "2026-10-12",
+    "tags": [],
+    "source": "sample",
+    "region": "chungnam"
+  },
+  {
+    "id": "2026-R-010",
+    "category": "entrusted",
+    "title": "로컬푸드 직매장 위탁운영 사업자 모집",
+    "announceDate": "2026-09-21",
+    "agency": "들녘군청",
+    "period": {
+      "start": "2027-01-01",
+      "end": "2029-12-31"
+    },
+    "content": "지역 농산물 직매장 운영 및 출하 농가 관리",
+    "target": "농업법인, 사회적협동조합",
+    "budget": 450000000,
+    "deadline": "2026-10-24",
+    "tags": [],
+    "source": "sample",
+    "region": "jeonbuk"
+  },
+  {
+    "id": "2026-R-011",
+    "category": "contract",
+    "title": "산불 감시 카메라 유지관리 수의계약 공고",
+    "announceDate": "2026-10-03",
+    "agency": "솔뫼군청",
+    "period": {
+      "start": "2026-11-01",
+      "end": "2027-10-31"
+    },
+    "content": "산불 감시 카메라 점검·통신 장애 복구",
+    "target": "정보통신공사업 등록 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 47000000,
+    "deadline": "2026-10-15",
+    "tags": [],
+    "source": "sample",
+    "region": "gyeongbuk"
+  },
+  {
+    "id": "2026-R-012",
+    "category": "entrusted",
+    "title": "청소년 해양수련원 위탁운영 수탁기관 공모",
+    "announceDate": "2026-09-15",
+    "agency": "물결시청",
+    "period": {
+      "start": "2027-01-01",
+      "end": "2029-12-31"
+    },
+    "content": "청소년 해양 체험 프로그램 및 수련원 시설 운영",
+    "target": "청소년 활동 관련 비영리법인",
+    "budget": 1150000000,
+    "deadline": "2026-10-11",
+    "tags": [],
+    "source": "sample",
+    "region": "gyeongnam"
+  },
+  {
+    "id": "2026-R-013",
+    "category": "contract",
+    "title": "관광안내소 리플릿 다국어 번역·인쇄 수의계약",
+    "announceDate": "2026-10-04",
+    "agency": "돌담시청",
+    "period": {
+      "start": "2026-11-01",
+      "end": "2026-12-31"
+    },
+    "content": "관광 안내 리플릿 영·중·일 번역 및 인쇄",
+    "target": "번역·인쇄 업체",
+    "applyUrl": "https://www.g2b.go.kr",
+    "budget": 16000000,
+    "deadline": "2026-10-18",
+    "tags": [],
+    "source": "sample",
+    "region": "jeju"
   }
 ]

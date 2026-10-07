@@ -68,6 +68,8 @@ export async function collectNaraBid(source, env, { today }) {
       title: item.bidNtceNm,
       announceDate: item.bidNtceDt ?? item.rgstDt,
       agency: item.ntceInsttNm ?? item.dminsttNm,
+      // 사업 지역은 수요기관(실제 사업을 하는 기관) 이름에서 찾음
+      region: item.dminsttNm ?? item.ntceInsttNm,
       period: null,
       content: [item.ntceKindNm, item.cntrctCnclsMthdNm, item.dminsttNm && `수요기관 ${item.dminsttNm}`]
         .filter(Boolean)
