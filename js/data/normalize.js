@@ -2,6 +2,7 @@
 // id·공고명이 없는 항목은 버리고, 날짜·예산 형식을 정리합니다.
 import { toDateString } from '../services/date.js';
 import { isSafeUrl } from '../services/links.js';
+import { resolveRegion } from '../services/regions.js';
 
 // 공고 원문·신청 페이지 주소: http(s) 주소만 남김
 function toLink(value) {
@@ -27,6 +28,8 @@ export function normalizePolicy(raw) {
       ? { start: toDateString(raw.period.start), end: toDateString(raw.period.end) }
       : null,
     budget: toAmount(raw.budget),
+    // 지역: region 값(id·이름)이 없으면 기관 이름에서 찾음 (공고명은 '부산물'처럼 오인할 수 있어 쓰지 않음)
+    region: resolveRegion(raw.region) ?? resolveRegion(raw.agency) ?? undefined,
     url: toLink(raw.url),
     applyUrl: toLink(raw.applyUrl),
   };

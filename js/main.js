@@ -17,6 +17,7 @@ import {
   RECOMMENDER,
   SEARCH_FIELDS,
   NEW_BADGE_DAYS,
+  REGIONS,
   NOTIFY_CONFIG,
   SIMILAR_LIMIT,
   STORAGE_KEYS,
@@ -44,11 +45,15 @@ import { createDeadlineAlert } from './components/deadlineAlert.js';
 import { createNotifySettings } from './components/notifySettings.js';
 import { renderSummaryStats } from './components/summaryStats.js';
 import { createRecentSearch } from './components/recentSearch.js';
+import { createRegionExplorer } from './components/regionExplorer.js';
+import { KOREA_MAP_PATHS, KOREA_MAP_VIEWBOX } from './data/koreaMap.js';
+import { regionLabel } from './services/regions.js';
 
 const URL_OPTIONS = {
   categories: CATEGORIES,
   fields: SEARCH_FIELDS,
   columns: COLUMNS,
+  regions: REGIONS,
   defaults: { category: CATEGORIES[0].id, sort: DEFAULT_SORT },
 };
 
@@ -73,6 +78,7 @@ function exportValue(policy, field) {
   const value = policy[field.key];
   if (field.format === 'category') return CATEGORY_LABELS[value] ?? value;
   if (field.format === 'range') return value ? `${value.start ?? ''} ~ ${value.end ?? ''}` : '';
+  if (field.format === 'region') return regionLabel(value);
   return value;
 }
 
@@ -258,6 +264,38 @@ async function init() {
     });
   }
 
+  // 지역별 공고 지도
+  const showResults = () => {
+    const results = document.getElementById('results');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    results.focus({ preventScroll: true });
+  };
+  const regionExplorer = createRegionExplorer(document.getElementById('region-explorer'), {
+    regions: REGIONS,
+    paths: KOREA_MAP_PATHS,
+    viewBox: KOREA_MAP_VIEWBOX,
+    deadlineWarningDays: DEADLINE_WARNING_DAYS,
+    onSelect: (region) => store.set({ region, visibleCount: PAGE_SIZE }),
+    onOpenDetail: (id) => store.set({ detailId: id }),
+    onShowResults: showResults,
+  });
+
+  // 결과 위쪽의 '지역: 서울 ×' 표시 (누르면 전국으로)
+  const activeRegion = document.getElementById('active-region');
+  function renderActiveRegion(region) {
+    if (!region) {
+      activeRegion.replaceChildren();
+      return;
+    }
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip-button active-region__chip';
+    chip.setAttribute('aria-label', `지역 조건 ${regionLabel(region)} 해제`);
+    chip.textContent = `지역: ${regionLabel(region)} ×`;
+    chip.addEventListener('click', () => store.set({ region: '', visibleCount: PAGE_SIZE }));
+    activeRegion.replaceChildren(chip);
+  }
+
   let prev = null;
   let prevFilters = null;
   const update = (state) => {
@@ -268,6 +306,7 @@ async function init() {
     const listChanged =
       !prev ||
       prev.category !== state.category ||
+      prev.region !== state.region ||
       prev.filters !== state.filters ||
       prev.sort !== state.sort ||
       prev.visibleCount !== state.visibleCount ||
@@ -301,6 +340,20 @@ async function init() {
             : undefined,
       });
       loadMore.render(visible.length, currentResults.length);
+
+      // 지도: 지역 조건을 뺀 현재 검색 결과를 지역별로 셈
+      const withoutRegion = filterPolicies(base, { ...state, region: '' }, SEARCH_FIELDS);
+      const regionCounts = {};
+      withoutRegion.forEach((policy) => {
+        if (policy.region) regionCounts[policy.region] = (regionCounts[policy.region] ?? 0) + 1;
+      });
+      regionExplorer.render({
+        selected: state.region,
+        counts: regionCounts,
+        items: currentResults,
+        total: withoutRegion.length,
+      });
+      renderActiveRegion(state.region);
     } else if (favoritesChanged) {
       table.setFavorites(favorites);
     }

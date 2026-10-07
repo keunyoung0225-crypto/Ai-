@@ -33,6 +33,14 @@
   --color-alert-border: #f0d9a0;
   --color-overlay: rgba(12, 30, 52, 0.45);
 
+  /* 지도 색 단계 (공고 수, 한 가지 파란색의 밝기 차이) */
+  --map-0: #e9eef3;
+  --map-1: #cde2fb;
+  --map-2: #9ec5f4;
+  --map-3: #5598e7;
+  --map-4: #1c5cab;
+  --map-stroke: #ffffff;
+
   /* 글꼴 */
   --font-display: 'Noto Serif KR', 'Batang', serif;
   --font-sans: 'IBM Plex Sans KR', 'Noto Sans KR', system-ui, -apple-system, 'Malgun Gothic', sans-serif;
@@ -89,6 +97,12 @@
     --color-alert-bg: #2e2514;
     --color-alert-border: #5c4a22;
     --color-overlay: rgba(0, 0, 0, 0.6);
+    --map-0: #1c2a39;
+    --map-1: #104281;
+    --map-2: #1c5cab;
+    --map-3: #3987e5;
+    --map-4: #9ec5f4;
+    --map-stroke: #0c1621;
     --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-pop: 0 18px 48px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
@@ -120,6 +134,12 @@
   --color-alert-bg: #2e2514;
   --color-alert-border: #5c4a22;
   --color-overlay: rgba(0, 0, 0, 0.6);
+  --map-0: #1c2a39;
+  --map-1: #104281;
+  --map-2: #1c5cab;
+  --map-3: #3987e5;
+  --map-4: #9ec5f4;
+  --map-stroke: #0c1621;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-pop: 0 18px 48px rgba(0, 0, 0, 0.5);
   color-scheme: dark;

@@ -39,10 +39,12 @@ const matchers = {
   },
 };
 
-export function filterPolicies(policies, { category, filters }, fields) {
+// region: 지역 id ('' 또는 없으면 전체)
+export function filterPolicies(policies, { category, filters, region }, fields) {
   return policies.filter(
     (policy) =>
       (category === 'all' || policy.category === category) &&
+      (!region || policy.region === region) &&
       fields.every((field) =>
         matchers[field.type](policy[field.key], filters[field.key], field, policy),
       ),

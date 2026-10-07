@@ -3,6 +3,7 @@
 import { formatValue } from '../services/format.js';
 import { daysUntil, isDateString } from '../services/date.js';
 import { displayHost, isSafeUrl } from '../services/links.js';
+import { regionLabel } from '../services/regions.js';
 import { createDeadlineBadge } from './deadlineBadge.js';
 import { createFavoriteButton, setFavoriteState } from './favoriteButton.js';
 
@@ -60,6 +61,20 @@ const cellRenderers = {
       mark.textContent = '↗';
       link.append(label, host, mark);
       fragment.append(link);
+    }
+    return fragment;
+  },
+
+  // 주체기관 + 지역 표시
+  agencyWithRegion(policy) {
+    const fragment = document.createDocumentFragment();
+    fragment.append(policy.agency ?? '-');
+    const label = regionLabel(policy.region);
+    if (label) {
+      const tag = document.createElement('span');
+      tag.className = 'region-tag';
+      tag.textContent = label;
+      fragment.append(tag);
     }
     return fragment;
   },

@@ -44,6 +44,8 @@
   <main class="container">
     <div class="deadline-alert" id="deadline-alert" hidden></div>
 
+    <section class="card region-explorer" id="region-explorer"></section>
+
     <section class="card recent-search" id="recent-search" hidden></section>
 
     <nav class="category-tabs" id="category-tabs" aria-label="검색유형"></nav>
@@ -53,6 +55,7 @@
     <section class="card" id="results" tabindex="-1" aria-label="검색 결과">
       <div class="result-toolbar">
         <p class="result-summary" id="result-summary" aria-live="polite"></p>
+        <div class="active-region" id="active-region"></div>
         <div class="result-actions" id="result-actions"></div>
         <div class="sort-select" id="sort-select"></div>
       </div>
@@ -61,6 +64,7 @@
     </section>
 
     <p class="notice" id="data-notice">※ 화면에 표시된 공고는 시연용 가상 데이터입니다.</p>
+    <p class="notice notice--credit">지도: <a href="https://github.com/VictorCazanave/svg-maps" target="_blank" rel="noopener noreferrer">svg-maps/south-korea</a> (Victor Cazanave, CC BY 4.0)</p>
 
     <noscript>
       <p class="notice">이 서비스를 이용하려면 브라우저에서 JavaScript를 켜 주세요.</p>
