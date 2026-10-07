@@ -40,6 +40,7 @@ import { createLoadMore } from './components/loadMore.js';
 import { createDetailModal } from './components/detailModal.js';
 import { createDeadlineAlert } from './components/deadlineAlert.js';
 import { createNotifySettings } from './components/notifySettings.js';
+import { renderSummaryStats } from './components/summaryStats.js';
 
 const URL_OPTIONS = {
   categories: CATEGORIES,
@@ -91,7 +92,11 @@ function createDataRepository() {
 }
 
 async function init() {
-  renderHeader(document.getElementById('app-header'), { title: APP_TITLE, subtitle: APP_SUBTITLE });
+  renderHeader(document.getElementById('app-header'), {
+    title: APP_TITLE,
+    subtitle: APP_SUBTITLE,
+    emphasis: APP_SHORT_TITLE,
+  });
   createThemeToggle(document.getElementById('theme-toggle'), { storageKey: STORAGE_KEYS.theme });
 
   // store는 데이터를 불러온 뒤 만들어지며, 아래 콜백들은 그 이후에만 호출됩니다.
@@ -119,6 +124,9 @@ async function init() {
   }
   const { policies } = loaded;
   document.getElementById('data-notice').textContent = dataNotice(loaded);
+  renderSummaryStats(document.getElementById('summary-stats'), policies, {
+    deadlineWarningDays: DEADLINE_WARNING_DAYS,
+  });
   const policiesById = new Map(policies.map((policy) => [policy.id, policy]));
 
   // select 검색 필드의 선택지는 데이터에서 자동 추출
@@ -224,6 +232,12 @@ async function init() {
       tabs.setActive(state.category);
       sortSelect.setValue(state.sort);
       const base = state.favoritesOnly ? policies.filter((p) => favorites.has(p.id)) : policies;
+      // 버튼마다 '지금 검색 조건에서 그 유형을 고르면 나올 공고 수'를 표시
+      tabs.setCounts(
+        Object.fromEntries(
+          CATEGORIES.map((c) => [c.id, filterPolicies(base, { ...state, category: c.id }, SEARCH_FIELDS).length]),
+        ),
+      );
       currentResults = sortPolicies(
         filterPolicies(base, state, SEARCH_FIELDS),
         state.sort,
