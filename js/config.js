@@ -188,9 +188,9 @@ export const AD_SLOTS = {
     maxHeight: 900,
     resizable: true,
     storageKey: STORAGE_KEYS.adSideHeight,
-    imageUrl: '',
-    linkUrl: '',
-    alt: '',
+    imageUrl: 'https://keunyoung0225-crypto.github.io/Ai-/images/Image_san.png',
+    linkUrl: 'https://www.forest.go.kr',
+    alt: '산림청 홈페이지 산불조심',
   },
   bottom: { enabled: true, width: 320, height: 50, imageUrl: '', linkUrl: '', alt: '', closable: true },
 };
