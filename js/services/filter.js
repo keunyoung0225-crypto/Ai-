@@ -1,0 +1,57 @@
+// 검색·정렬 로직 (화면과 무관한 순수 함수).
+
+// 검색 필드 type별 일치 여부 판단
+const matchers = {
+  text(value, query) {
+    const needle = (query ?? '').trim().toLowerCase();
+    if (!needle) return true;
+    return String(value ?? '').toLowerCase().includes(needle);
+  },
+
+  select(value, selected) {
+    return !selected || value === selected;
+  },
+
+  // value가 날짜 문자열이면 그 날짜가, {start, end} 기간이면 기간이 [from, to]와 겹치는지 검사
+  dateRange(value, range) {
+    const { from, to } = range ?? {};
+    if (!from && !to) return true;
+    if (!value) return false;
+    const start = typeof value === 'object' ? value.start : value;
+    const end = typeof value === 'object' ? value.end : value;
+    return (!from || end >= from) && (!to || start <= to);
+  },
+};
+
+export function filterPolicies(policies, { category, filters }, fields) {
+  return policies.filter(
+    (policy) =>
+      (category === 'all' || policy.category === category) &&
+      fields.every((field) => matchers[field.type](policy[field.key], filters[field.key])),
+  );
+}
+
+// 정렬 기준값: 기간은 시작일 기준
+function sortValue(value) {
+  return value && typeof value === 'object' ? value.start : value;
+}
+
+export function sortPolicies(policies, { key, dir }) {
+  const sign = dir === 'desc' ? -1 : 1;
+  return [...policies].sort((a, b) => {
+    const left = sortValue(a[key]);
+    const right = sortValue(b[key]);
+    if (left == null) return 1;
+    if (right == null) return -1;
+    if (left < right) return -sign;
+    if (left > right) return sign;
+    return 0;
+  });
+}
+
+// select 검색 필드의 선택지: 데이터에 있는 값을 중복 없이 가나다순으로
+export function uniqueValues(policies, key) {
+  return [...new Set(policies.map((policy) => policy[key]).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, 'ko'),
+  );
+}
