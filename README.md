@@ -28,7 +28,7 @@
 - **광고 영역**: PC(1100px 이상)는 화면 왼쪽 세로 광고(기본 160×600, 아래 손잡이로 세로 크기 조절, 스크롤해도 따라옴), 휴대폰·좁은 화면은 맨 아래 고정 띠 광고(320×50, 닫기 가능)
 - **접근성**: 키보드 초점 표시, '검색 결과로 바로가기', 움직임 줄이기 설정 존중
 - **휴대폰 알림**: 관심 키워드에 맞는 새 공고를 매일 아침 9시에 휴대폰으로 알림 (무료 앱 ntfy, 아래 '휴대폰 알림' 참고)
-- **매일 자동 갱신**: 매일 아침 구글 시트·CSV, 나라장터 API에서 공고를 모아 데이터 갱신, 새 공고에 `NEW` 표시 (아래 '공고 데이터 매일 갱신' 참고)
+- **매일 자동 갱신**: 매일 아침 구글 시트·CSV, 나라장터 API, 중소벤처기업부 지원사업(기업마당 API)에서 공고를 모아 데이터 갱신, 새 공고에 `NEW` 표시 (아래 '공고 데이터 매일 갱신' 참고)
 
 > 현재 공고 데이터(`data/policies.json`)는 **시연용 가상 데이터**입니다.
 
@@ -75,7 +75,7 @@ data/policies.json      공고 데이터
 alerts/subscriptions.json  휴대폰 알림 관심 키워드
 scripts/update-data.mjs 매일 공고 데이터 갱신 스크립트
 scripts/sources.json    갱신할 데이터 출처 설정 (켜기/끄기)
-scripts/collectors/     출처별 수집기 (csv: 구글 시트·CSV, naraBid: 나라장터 API)
+scripts/collectors/     출처별 수집기 (csv: 구글 시트·CSV, naraBid: 나라장터 API, bizinfo: 기업마당 API)
 scripts/notify.mjs      매일 아침 알림 발송 스크립트
 templates/policies-template.csv  공고 입력용 표 양식
 .github/workflows/daily.yml  매일 08:30 갱신 → 저장 → 알림 자동 실행 설정
@@ -118,12 +118,13 @@ templates/policies-template.csv  공고 입력용 표 양식
 
 ### 데이터 출처 켜기
 `scripts/sources.json`에서 쓸 출처의 `"enabled"`를 `true`로 바꾸고, 필요한 값을 GitHub 저장소
-**Settings → Secrets and variables → Actions → Secrets**에 등록합니다. 두 출처를 함께 써도 됩니다.
+**Settings → Secrets and variables → Actions → Secrets**에 등록합니다. 여러 출처를 함께 써도 됩니다.
 
 | 출처 | 내용 | 등록할 Secret |
 |---|---|---|
 | `sheet` (구글 시트·CSV) | 직접 정리한 공고. 수의계약·위수탁지원사업 모두 가능 | `POLICY_SHEET_CSV_URL` |
 | `nara` (나라장터 API) | 조달청 나라장터의 수의계약 공고 자동 수집 | `DATA_GO_KR_KEY` |
+| `mss` (기업마당 API) | 중소벤처기업부 지원사업 공고 자동 수집 → `위수탁지원사업` | `BIZINFO_API_KEY` |
 
 **구글 시트로 관리하기 (권장)**
 1. `templates/policies-template.csv`를 구글 시트로 가져옵니다. 열: 공고ID(선택), 검색유형, 공고명, 공고일, 주체기관,
@@ -145,6 +146,19 @@ templates/policies-template.csv  공고 입력용 표 양식
 > ⚠ 나라장터 수집기는 실제 API로 시험하지 못했습니다. 처음 연결한 뒤 Actions 실행 결과를 확인하고,
 > 오류가 나면 공공데이터포털 문서의 주소(`endpoint`)·기능 이름(`operations`)·응답 필드 이름을
 > `sources.json`과 `scripts/collectors/naraBid.js`에 맞춰 주세요.
+
+**중소벤처기업부 지원사업 연결 (기업마당 API)**
+중소벤처기업부 지원사업 공고는 기업마당(bizinfo.go.kr)에 모여 있어, 기업마당 API로 가져옵니다.
+1. 기업마당 누리집에 회원가입 후 **정책정보 개방 → API 목록 → 지원사업정보 API**에서 사용 신청을 하고 인증키를 받습니다.
+2. 인증키를 Secret `BIZINFO_API_KEY`로 등록하고 `sources.json`의 `mss`를 켭니다.
+3. 소관 부처가 `중소벤처기업부`인 공고만 `위수탁지원사업`으로 가져옵니다.
+   - 다른 부처도 받으려면 `agencyIncludes`에 이름을 더합니다. 예: `["중소벤처기업부", "산업통상자원부"]` (비우면 기업마당 공고 전체)
+   - 한 번에 받는 공고 수는 `count`(기본 500건, 최신 공고부터)입니다.
+4. 사업 요약은 앞 200자만 보여 주고, 지역은 수행기관 이름(예: 경기테크노파크 → 경기)에서 찾습니다. 전국 사업은 지도에 표시되지 않습니다.
+   기업마당은 사업기간·예산을 주지 않아 그 칸은 `-`로, '예산 소진 시까지' 같은 공고는 마감일 없이 표시됩니다.
+
+> ⚠ 기업마당 수집기도 실제 API로 시험하지 못했습니다(시험용 가짜 서버로만 확인). 처음 연결한 뒤 Actions 실행 결과를 확인하고,
+> 오류가 나면 기업마당 API 안내의 응답 필드 이름을 `scripts/collectors/bizinfo.js`에 맞춰 주세요.
 
 ### 갱신 규칙
 - 처음 들어온 공고에는 수집한 날짜(`firstSeen`)를 기록하고, 사이트에서 이틀 동안 `NEW`로 표시합니다.
