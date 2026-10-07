@@ -1,6 +1,7 @@
 // 결과 표: config의 COLUMNS로 머리글과 행을 자동 생성
 // 모바일(좁은 화면)에서는 CSS가 각 행을 카드 형태로 바꿔 보여줍니다. (td의 data-label 사용)
 import { formatValue } from '../services/format.js';
+import { daysUntil, isDateString } from '../services/date.js';
 import { createDeadlineBadge } from './deadlineBadge.js';
 import { createFavoriteButton, setFavoriteState } from './favoriteButton.js';
 
@@ -10,7 +11,7 @@ const SORT_ARROW = { asc: '▲', desc: '▼' };
 // 특수한 칸 그리기 방식 (열 정의의 render 이름으로 선택)
 const cellRenderers = {
   // 관심공고 별 + 공고명(누르면 상세 보기) + 사업 요약
-  titleWithSummary(policy, column, { onOpenDetail, onToggleFavorite, favorites }) {
+  titleWithSummary(policy, column, { onOpenDetail, onToggleFavorite, favorites, newBadgeDays }) {
     const fragment = document.createDocumentFragment();
     const head = document.createElement('div');
     head.className = 'policy-head';
@@ -23,6 +24,13 @@ const cellRenderers = {
       createFavoriteButton(policy, { isFavorite: favorites.has(policy.id), onToggle: onToggleFavorite }),
       title,
     );
+    // 매일 갱신에서 최근 새로 들어온 공고
+    if (newBadgeDays > 0 && isDateString(policy.firstSeen) && daysUntil(policy.firstSeen) > -newBadgeDays) {
+      const badge = document.createElement('span');
+      badge.className = 'badge badge--new';
+      badge.textContent = 'NEW';
+      head.append(badge);
+    }
     fragment.append(head);
 
     if (policy.content) {
@@ -55,9 +63,9 @@ function createMessage(text, isError = false) {
 export function createResultTable(
   container,
   columns,
-  { summary, onSort, onOpenDetail, onToggleFavorite, deadlineWarningDays },
+  { summary, onSort, onOpenDetail, onToggleFavorite, deadlineWarningDays, newBadgeDays = 0 },
 ) {
-  const context = { onOpenDetail, onToggleFavorite, deadlineWarningDays, favorites: new Set() };
+  const context = { onOpenDetail, onToggleFavorite, deadlineWarningDays, newBadgeDays, favorites: new Set() };
 
   const table = document.createElement('table');
   table.className = 'result-table';

@@ -358,6 +358,13 @@ th.is-sorted .sort-button__arrow {
   color: var(--color-primary);
 }
 
+.badge--new {
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: var(--color-star);
+  color: #1f2d3d;
+}
+
 .badge--closed {
   background: var(--color-closed-soft);
   color: var(--color-closed);

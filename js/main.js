@@ -14,6 +14,7 @@ import {
   PAGE_SIZE,
   RECOMMENDER,
   SEARCH_FIELDS,
+  NEW_BADGE_DAYS,
   NOTIFY_CONFIG,
   SIMILAR_LIMIT,
   STORAGE_KEYS,
@@ -23,6 +24,7 @@ import { createRepository } from './data/repository.js';
 import { filterPolicies, sortPolicies, uniqueValues } from './services/filter.js';
 import { readUrlState, writeUrlState } from './services/urlState.js';
 import { deadlineStatus, isDateString, todayString } from './services/date.js';
+import { formatDate } from './services/format.js';
 import { loadFavorites, saveFavorites, toggleFavorite } from './services/favorites.js';
 import { downloadCsv, toCsv } from './services/csv.js';
 import { recommendSimilar } from './services/recommend.js';
@@ -69,10 +71,15 @@ function exportValue(policy, field) {
   return value;
 }
 
-function dataNotice({ source, error }) {
+function dataNotice({ source, error, policies }) {
   if (error) return '※ 실시간 공고를 불러오지 못해 시연용 가상 데이터를 표시합니다.';
-  if (source === 'json') return '※ 화면에 표시된 공고는 시연용 가상 데이터입니다.';
-  return '※ 공고 정보는 외부 API에서 불러왔습니다. 정확한 내용은 공고 원문을 확인하세요.';
+  if (source === 'api') return '※ 공고 정보는 외부 API에서 불러왔습니다. 정확한 내용은 공고 원문을 확인하세요.';
+  // 매일 갱신(scripts/update-data.mjs)으로 모은 공고에는 수집 출처(source)가 기록됨
+  if (!policies.length || policies.some((p) => !p.source || p.source === 'sample')) {
+    return '※ 화면에 표시된 공고는 시연용 가상 데이터입니다.';
+  }
+  const lastUpdate = policies.reduce((latest, p) => (p.firstSeen > latest ? p.firstSeen : latest), '');
+  return `※ 공고는 매일 아침 자동으로 갱신됩니다.${lastUpdate ? ` (최근 새 공고: ${formatDate(lastUpdate)})` : ''} 정확한 내용은 공고 원문을 확인하세요.`;
 }
 
 function createDataRepository() {
@@ -94,6 +101,7 @@ async function init() {
   const table = createResultTable(document.getElementById('result-table'), COLUMNS, {
     summary: document.getElementById('result-summary'),
     deadlineWarningDays: DEADLINE_WARNING_DAYS,
+    newBadgeDays: NEW_BADGE_DAYS,
     onSort: (key) => store.set({ sort: nextSort(store.get().sort, key), visibleCount: PAGE_SIZE }),
     onOpenDetail: (id) => store.set({ detailId: id }),
     onToggleFavorite: toggleFavoriteById,

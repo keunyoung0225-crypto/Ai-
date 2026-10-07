@@ -100,6 +100,9 @@ export const PAGE_SIZE = 10;
 // 마감 임박으로 강조할 기준(일)
 export const DEADLINE_WARNING_DAYS = 7;
 
+// 매일 갱신에서 새로 들어온 공고에 'NEW' 표시를 붙이는 기간(일). 0이면 표시 안 함
+export const NEW_BADGE_DAYS = 2;
+
 // 브라우저 저장 키 (관심공고·화면 모드는 이 기기에만 저장됩니다)
 // theme 키는 index.html의 화면 깜빡임 방지 스크립트에도 같은 값이 있습니다.
 export const STORAGE_KEYS = {

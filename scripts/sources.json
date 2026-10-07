@@ -1,0 +1,23 @@
+{
+  "keepDays": 365,
+  "sources": [
+    {
+      "id": "sheet",
+      "type": "csv",
+      "name": "직접 입력한 공고 (구글 시트·CSV)",
+      "enabled": false,
+      "urlEnv": "POLICY_SHEET_CSV_URL",
+      "defaultCategory": "entrusted"
+    },
+    {
+      "id": "nara",
+      "type": "naraBid",
+      "name": "나라장터 수의계약 공고",
+      "enabled": false,
+      "keyEnv": "DATA_GO_KR_KEY",
+      "days": 3,
+      "category": "contract",
+      "contractMethodIncludes": "수의"
+    }
+  ]
+}

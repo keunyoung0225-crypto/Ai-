@@ -5,6 +5,8 @@
 //   node scripts/notify.mjs --dry-run    보내지 않고 알림 내용만 출력
 //   node scripts/notify.mjs --since 2026-09-01   이 날짜부터 올라온 공고를 확인 (시험용)
 //   node scripts/notify.mjs --now        예약 없이 바로 발송
+//   node scripts/notify.mjs --new-ids .cache/new-policies.json
+//                                        공고 갱신(update-data.mjs)에서 오늘 새로 들어온 공고만 알림
 //
 // 환경 변수:
 //   NTFY_TOPIC        알림 주제 이름 (subscriptions.json의 topicEnv로 다른 이름도 사용 가능)
@@ -12,7 +14,7 @@
 //   NTFY_TOKEN        보호된 주제용 접근 토큰 (선택)
 //   SITE_URL          알림을 눌렀을 때 열 사이트 주소 (선택)
 //   POLICY_DATA_URL   공고 데이터를 받아올 주소 (선택, 없으면 data/policies.json 사용)
-//   SINCE, DRY_RUN, SEND_NOW   위 옵션과 같은 뜻 (GitHub Actions 수동 실행용)
+//   SINCE, DRY_RUN, SEND_NOW, NEW_IDS_FILE   위 옵션과 같은 뜻 (GitHub Actions용)
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -22,9 +24,9 @@ import { standardAdapter } from '../js/data/adapters/standard.js';
 import { buildDigest, findAlertMatches, parseKeywords } from '../js/services/alerts.js';
 import { isDateString } from '../js/services/date.js';
 import { publishNtfy } from '../js/services/ntfy.js';
+import { addDays, koreaDate } from './lib/dates.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const TIME_ZONE = 'Asia/Seoul';
 
 function parseOptions(argv, env) {
   const args = [...argv];
@@ -37,18 +39,18 @@ function parseOptions(argv, env) {
     sendNow: args.includes('--now') || env.SEND_NOW === 'true',
     since: valueOf('--since') || env.SINCE || undefined,
     today: valueOf('--today') || undefined,
+    newIdsFile: valueOf('--new-ids') || env.NEW_IDS_FILE || undefined,
   };
 }
 
-// 한국 시각 기준 날짜 'YYYY-MM-DD'
-function koreaDate(date) {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(date);
-}
-
-function addDays(dateString, days) {
-  const date = new Date(`${dateString}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
+// 공고 갱신 단계가 남긴 '오늘 새로 들어온 공고' 목록 (오늘 날짜 것만 사용)
+async function loadNewIds(file, today) {
+  try {
+    const data = JSON.parse(await readFile(path.resolve(ROOT, file), 'utf8'));
+    return data.date === today && Array.isArray(data.ids) ? new Set(data.ids) : null;
+  } catch {
+    return null;
+  }
 }
 
 async function loadPolicies(env) {
@@ -95,13 +97,22 @@ async function main() {
   const [policies, subscriptions] = await Promise.all([loadPolicies(env), loadSubscriptions()]);
   const delay = options.sendNow ? undefined : scheduledDelay(today, now);
 
-  console.log(`확인 기간: 공고일 ${since} ~ ${addDays(today, -1)} | 공고 ${policies.length}건 | 구독 ${subscriptions.length}개`);
+  // 시작 날짜를 직접 지정하지 않았고 갱신 단계의 새 공고 목록이 있으면 그 공고만 대상으로 함
+  const newIds = !options.since && options.newIdsFile ? await loadNewIds(options.newIdsFile, today) : null;
+  const candidates = newIds ? policies.filter((policy) => newIds.has(policy.id)) : policies;
+  const window = newIds ? {} : { since, until: today };
+
+  console.log(
+    newIds
+      ? `확인 대상: 오늘 갱신에서 새로 들어온 공고 ${candidates.length}건 | 구독 ${subscriptions.length}개`
+      : `확인 기간: 공고일 ${since} ~ ${addDays(today, -1)} | 공고 ${policies.length}건 | 구독 ${subscriptions.length}개`,
+  );
 
   let failures = 0;
   for (const sub of subscriptions) {
     const matches = findAlertMatches(
-      policies,
-      { keywords: sub.keywords, categories: sub.categories, since, until: today },
+      candidates,
+      { keywords: sub.keywords, categories: sub.categories, ...window },
       keywordFields,
     );
     console.log(`\n[${sub.name}] 키워드: ${sub.keywords.join(', ')} → 새 공고 ${matches.length}건`);
