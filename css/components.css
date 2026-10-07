@@ -549,6 +549,7 @@ th.is-sorted .sort-button__arrow {
 
 .apply-link {
   display: inline-flex;
+  white-space: nowrap;
   align-items: center;
   gap: 6px;
   margin: var(--space-2) 0 0 30px;
@@ -1656,6 +1657,39 @@ body:has(.detail-modal[open]) {
   line-height: 16px;
 }
 
+/* 세로 크기 조절 손잡이 */
+.ad-slot__resize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ad-width, 160px);
+  max-width: 100%;
+  height: 14px;
+  margin-top: 2px;
+  border-radius: var(--radius-sm);
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.ad-slot__resize:hover,
+.ad-slot__resize.is-dragging,
+.ad-slot__resize:focus-visible {
+  background: var(--color-primary-soft);
+}
+
+.ad-slot__grip {
+  width: 36px;
+  height: 4px;
+  border-top: 1.5px solid var(--color-border-strong);
+  border-bottom: 1.5px solid var(--color-border-strong);
+}
+
+.ad-slot__resize:hover .ad-slot__grip,
+.ad-slot__resize.is-dragging .ad-slot__grip {
+  border-color: var(--color-primary);
+}
+
 .ad-slot__close {
   position: absolute;
   top: 50%;
@@ -1694,12 +1728,20 @@ body:has(.detail-modal[open]) {
     padding-inline: 0;
   }
 
+  /* 왼쪽 광고 때문에 본문이 좁아지는 구간에서는 사업기간을 두 줄로 */
+  .result-table td[data-key="period"],
+  .result-table td[data-key="agency"] {
+    white-space: normal;
+    min-width: 7.5em;
+  }
+
   /* 제목부도 같은 폭으로 맞춤 */
   .site-header__inner {
     max-width: calc(var(--container-width) + 160px + 3 * var(--space-5));
   }
 
   .ad-slot--side {
+    width: 160px;
     position: sticky;
     top: calc(env(safe-area-inset-top, 0px) + var(--space-5));
     align-self: start;
