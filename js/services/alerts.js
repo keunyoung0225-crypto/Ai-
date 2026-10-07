@@ -32,7 +32,8 @@ export function findAlertMatches(policies, { keywords, categories = [], since, u
 export function buildDigest(matches, { maxItems = 10, siteUrl, titlePrefix = '정책한눈' } = {}) {
   const lines = matches.slice(0, maxItems).map(
     ({ policy, keywords }) =>
-      `• ${policy.title}\n  ${policy.agency ?? '-'} · 마감 ${formatDate(policy.deadline)} · 키워드: ${keywords.join(', ')}`,
+      `• ${policy.title}\n  ${policy.agency ?? '-'} · 마감 ${formatDate(policy.deadline)} · 키워드: ${keywords.join(', ')}` +
+      (policy.applyUrl ? `\n  신청: ${policy.applyUrl}` : ''),
   );
   if (matches.length > maxItems) lines.push(`외 ${matches.length - maxItems}건`);
 

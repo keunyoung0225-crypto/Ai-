@@ -547,6 +547,31 @@ th.is-sorted .sort-button__arrow {
   font-size: 14px;
 }
 
+.apply-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: var(--space-2) 0 0 30px;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.apply-link:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.apply-link__host {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
 .result-empty {
   padding: var(--space-7) var(--space-4);
   color: var(--color-text-muted);
@@ -901,6 +926,24 @@ body:has(.detail-modal[open]) {
 
 .detail-list dd {
   color: var(--color-ink);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.detail-list dd.is-muted {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.detail-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.detail-link:hover {
+  color: var(--color-primary-dark);
 }
 
 .detail-section {

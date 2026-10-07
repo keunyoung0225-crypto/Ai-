@@ -2,13 +2,31 @@
 import { formatValue } from '../services/format.js';
 import { createDeadlineBadge } from './deadlineBadge.js';
 import { createFavoriteButton, setFavoriteState } from './favoriteButton.js';
+import { displayUrl, isSafeUrl } from '../services/links.js';
 
-function isSafeUrl(url) {
-  try {
-    return ['http:', 'https:'].includes(new URL(url, window.location.href).protocol);
-  } catch {
-    return false;
-  }
+// 새 창으로 여는 외부 링크
+function createExternalLink(url, text, className) {
+  const link = document.createElement('a');
+  link.className = className;
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = text;
+  return link;
+}
+
+// 주소를 그대로 보여주는 링크 (+ 새 창 표시)
+function createAddressLink(url) {
+  const link = createExternalLink(url, displayUrl(url), 'detail-link');
+  link.title = url;
+  const mark = document.createElement('span');
+  mark.setAttribute('aria-hidden', 'true');
+  mark.textContent = ' ↗';
+  const hidden = document.createElement('span');
+  hidden.className = 'visually-hidden';
+  hidden.textContent = ' (새 창)';
+  link.append(mark, hidden);
+  return link;
 }
 
 // getSimilar(policy): 비슷한 공고 배열의 Promise
@@ -99,6 +117,16 @@ export function createDetailModal(
       const term = document.createElement('dt');
       term.textContent = field.label;
       const desc = document.createElement('dd');
+      if (field.format === 'link') {
+        const url = policy[field.key];
+        if (url && isSafeUrl(url)) desc.append(createAddressLink(url));
+        else {
+          desc.textContent = field.empty ?? '-';
+          desc.classList.add('is-muted');
+        }
+        list.append(term, desc);
+        return;
+      }
       desc.textContent = displayValue(policy, field);
       if (field.key === 'deadline') {
         const badge = createDeadlineBadge(policy.deadline, deadlineWarningDays);
@@ -114,20 +142,17 @@ export function createDetailModal(
     const actions = document.createElement('div');
     actions.className = 'detail-modal__actions';
     if (policy.url && isSafeUrl(policy.url)) {
-      const link = document.createElement('a');
-      link.className = 'btn btn--primary';
-      link.href = policy.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = '공고 원문 보기';
-      actions.append(link);
+      actions.append(createExternalLink(policy.url, '공고 원문 ↗', 'btn btn--ghost'));
+    }
+    if (policy.applyUrl && isSafeUrl(policy.applyUrl)) {
+      actions.append(createExternalLink(policy.applyUrl, '신청하러 가기 ↗', 'btn btn--primary'));
     }
     const okButton = document.createElement('button');
     okButton.type = 'button';
     okButton.className = 'btn btn--ghost';
     okButton.textContent = '닫기';
     okButton.addEventListener('click', () => dialog.close());
-    actions.append(okButton);
+    actions.prepend(okButton);
 
     panel.replaceChildren(header, list, similarSection, actions);
     return title;
