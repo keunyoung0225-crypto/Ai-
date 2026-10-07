@@ -172,6 +172,15 @@ export const EXPORT_FIELDS = [
   { key: 'url', label: '공고URL' },
 ];
 
+// 광고 영역. 넓은 화면(1100px 이상)은 왼쪽(side), 좁은 화면은 맨 아래(bottom)에 표시합니다.
+// (화면 너비 기준은 css/components.css의 '광고 영역' 부분과 같아야 합니다)
+// - imageUrl(광고 이미지 주소)과 linkUrl(누르면 갈 주소)을 채우면 그 광고가 나오고, 비워 두면 빈 광고 틀이 보입니다.
+// - enabled를 false로 하면 그 광고 영역을 숨깁니다.
+export const AD_SLOTS = {
+  side: { enabled: true, width: 160, height: 600, imageUrl: '', linkUrl: '', alt: '' },
+  bottom: { enabled: true, width: 320, height: 50, imageUrl: '', linkUrl: '', alt: '', closable: true },
+};
+
 // 상세 보기의 '비슷한 공고' 추천: 'rule'(규칙 기반) | 'ai'(AI 서버 연결 후 사용)
 export const RECOMMENDER = 'rule';
 export const SIMILAR_LIMIT = 3;

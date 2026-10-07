@@ -41,6 +41,10 @@
     </div>
   </header>
 
+  <div class="page-layout">
+    <!-- PC 화면 왼쪽 광고 영역 (넓은 화면에서만 보임) -->
+    <aside class="ad-slot ad-slot--side" id="ad-side" aria-label="광고"></aside>
+
   <main class="container">
     <div class="deadline-alert" id="deadline-alert" hidden></div>
 
@@ -70,6 +74,10 @@
       <p class="notice">이 서비스를 이용하려면 브라우저에서 JavaScript를 켜 주세요.</p>
     </noscript>
   </main>
+  </div>
+
+  <!-- 휴대폰 화면 맨 아래 광고 영역 (좁은 화면에서만 보임) -->
+  <aside class="ad-slot ad-slot--bottom" id="ad-bottom" aria-label="광고"></aside>
 
   <script type="module" src="js/main.js"></script>
 </body>
