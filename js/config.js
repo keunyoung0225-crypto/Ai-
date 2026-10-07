@@ -1,7 +1,9 @@
 // 앱 설정: 카테고리·검색 조건·표 열은 모두 이 파일에서 정의합니다.
 // 화면은 아래 배열을 읽어 자동으로 그려지므로, 항목 추가/순서 변경은 여기만 수정하면 됩니다.
 
-export const APP_TITLE = '2026년 정책모아';
+export const APP_TITLE = '2026년 모아보는 정책한눈';
+// 휴대폰 알림 제목처럼 짧게 써야 하는 곳에 쓰는 이름
+export const APP_SHORT_TITLE = '정책한눈';
 export const APP_SUBTITLE = '수의계약·위수탁지원사업 공고를 한눈에 찾아보세요';
 
 // 데이터 출처: 'json'(로컬 샘플) | 'api'(외부 API)

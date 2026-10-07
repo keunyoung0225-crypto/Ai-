@@ -18,7 +18,7 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { API_CONFIG, DATA_URL, NOTIFY_CONFIG, SEARCH_FIELDS } from '../js/config.js';
+import { API_CONFIG, APP_SHORT_TITLE, DATA_URL, NOTIFY_CONFIG, SEARCH_FIELDS } from '../js/config.js';
 import { adapters } from '../js/data/adapters/index.js';
 import { standardAdapter } from '../js/data/adapters/standard.js';
 import { buildDigest, findAlertMatches, parseKeywords } from '../js/services/alerts.js';
@@ -118,7 +118,11 @@ async function main() {
     console.log(`\n[${sub.name}] 키워드: ${sub.keywords.join(', ')} → 새 공고 ${matches.length}건`);
     if (!matches.length) continue;
 
-    const digest = buildDigest(matches, { maxItems: NOTIFY_CONFIG.maxItems, siteUrl: env.SITE_URL || undefined });
+    const digest = buildDigest(matches, {
+      maxItems: NOTIFY_CONFIG.maxItems,
+      siteUrl: env.SITE_URL || undefined,
+      titlePrefix: APP_SHORT_TITLE,
+    });
     if (options.dryRun) {
       console.log(`(보내지 않음) ${digest.title}\n${digest.message}`);
       continue;

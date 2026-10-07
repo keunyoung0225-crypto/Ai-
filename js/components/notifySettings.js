@@ -19,7 +19,7 @@ function el(tag, attrs = {}, children = []) {
 // getCurrentKeyword(): 지금 검색칸의 키워드 (처음 열 때 채워 넣기용)
 export function createNotifySettings(
   buttonContainer,
-  { policies, keywordFields, getCurrentKeyword, storageKey, config },
+  { policies, keywordFields, getCurrentKeyword, storageKey, config, appName },
 ) {
   const saved = readJson(storageKey, {});
   let topic = isValidTopic(saved.topic) ? saved.topic : randomTopic(config.topicPrefix);
@@ -160,8 +160,8 @@ export function createNotifySettings(
     const list = keywords();
     const matches = findAlertMatches(policies, { keywords: list }, keywordFields);
     const digest = matches.length
-      ? buildDigest(matches, { maxItems: 3, titlePrefix: '[테스트] 정책모아' })
-      : { title: '[테스트] 정책모아', message: `키워드 "${list.join(', ')}"에 맞는 공고가 아직 없습니다.` };
+      ? buildDigest(matches, { maxItems: 3, titlePrefix: `[테스트] ${appName}` })
+      : { title: `[테스트] ${appName}`, message: `키워드 "${list.join(', ')}"에 맞는 공고가 아직 없습니다.` };
 
     testButton.disabled = true;
     testStatus.textContent = '보내는 중…';

@@ -2,6 +2,7 @@
 import {
   API_CONFIG,
   APP_TITLE,
+  APP_SHORT_TITLE,
   APP_SUBTITLE,
   CATEGORIES,
   COLUMNS,
@@ -196,6 +197,7 @@ async function init() {
     getCurrentKeyword: () => (keywordField ? store.get().filters[keywordField.key]?.trim() : ''),
     storageKey: STORAGE_KEYS.notify,
     config: NOTIFY_CONFIG,
+    appName: APP_SHORT_TITLE,
   });
 
   const alert = createDeadlineAlert(document.getElementById('deadline-alert'), {
