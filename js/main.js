@@ -1,6 +1,7 @@
 // 앱 시작점: 설정·데이터·상태·화면 부품을 연결합니다.
 import {
   API_CONFIG,
+  AD_SLOTS,
   APP_TITLE,
   APP_SHORT_TITLE,
   APP_SUBTITLE,
@@ -46,6 +47,7 @@ import { createNotifySettings } from './components/notifySettings.js';
 import { renderSummaryStats } from './components/summaryStats.js';
 import { createRecentSearch } from './components/recentSearch.js';
 import { createRegionExplorer } from './components/regionExplorer.js';
+import { renderAdSlot } from './components/adSlot.js';
 import { KOREA_MAP_PATHS, KOREA_MAP_VIEWBOX } from './data/koreaMap.js';
 import { regionLabel } from './services/regions.js';
 
@@ -101,6 +103,13 @@ function createDataRepository() {
 }
 
 async function init() {
+  // 광고 영역 (데이터를 불러오지 못해도 표시)
+  renderAdSlot(document.getElementById('ad-side'), AD_SLOTS.side);
+  document.body.classList.toggle('has-bottom-ad', Boolean(AD_SLOTS.bottom?.enabled));
+  renderAdSlot(document.getElementById('ad-bottom'), AD_SLOTS.bottom, {
+    onClose: () => document.body.classList.remove('has-bottom-ad'),
+  });
+
   renderHeader(document.getElementById('app-header'), {
     title: APP_TITLE,
     subtitle: APP_SUBTITLE,

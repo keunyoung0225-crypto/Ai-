@@ -140,6 +140,7 @@ export const STORAGE_KEYS = {
   theme: 'policyMoa.theme',
   notify: 'policyMoa.notify',
   recentKeyword: 'policyMoa.recentKeyword',
+  adSideHeight: 'policyMoa.adSideHeight',
 };
 
 // '최근 검색 공고'에 보여줄 공고 수 (마지막으로 검색한 키워드 기준)
@@ -171,6 +172,28 @@ export const EXPORT_FIELDS = [
   { key: 'applyUrl', label: '신청URL' },
   { key: 'url', label: '공고URL' },
 ];
+
+// 광고 영역. 넓은 화면(1100px 이상)은 왼쪽(side), 좁은 화면은 맨 아래(bottom)에 표시합니다.
+// (화면 너비 기준은 css/components.css의 '광고 영역' 부분과 같아야 합니다)
+// - imageUrl(광고 이미지 주소)과 linkUrl(누르면 갈 주소)을 채우면 그 광고가 나오고, 비워 두면 빈 광고 틀이 보입니다.
+// - enabled를 false로 하면 그 광고 영역을 숨깁니다.
+// - resizable: true면 광고 틀 아래 손잡이를 끌어(또는 키보드 ↑↓) 세로 높이를 minHeight~maxHeight 사이에서 조절할 수 있습니다.
+//   조절한 높이는 이 브라우저에 기억되고(storageKey), 손잡이를 두 번 누르면 height(기본 높이)로 돌아갑니다.
+export const AD_SLOTS = {
+  side: {
+    enabled: true,
+    width: 160,
+    height: 600,
+    minHeight: 250,
+    maxHeight: 900,
+    resizable: true,
+    storageKey: STORAGE_KEYS.adSideHeight,
+    imageUrl: '',
+    linkUrl: '',
+    alt: '',
+  },
+  bottom: { enabled: true, width: 320, height: 50, imageUrl: '', linkUrl: '', alt: '', closable: true },
+};
 
 // 상세 보기의 '비슷한 공고' 추천: 'rule'(규칙 기반) | 'ai'(AI 서버 연결 후 사용)
 export const RECOMMENDER = 'rule';
