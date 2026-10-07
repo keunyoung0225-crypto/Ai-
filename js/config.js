@@ -105,6 +105,18 @@ export const DEADLINE_WARNING_DAYS = 7;
 export const STORAGE_KEYS = {
   favorites: 'policyMoa.favorites',
   theme: 'policyMoa.theme',
+  notify: 'policyMoa.notify',
+};
+
+// 휴대폰 알림 (무료 앱 ntfy 사용). 매일 아침 GitHub Actions가 scripts/notify.mjs를 실행해 발송합니다.
+// - sendTime: 알림이 도착할 한국 시각. 작업은 그보다 먼저 실행되고 ntfy 예약 발송으로 이 시각에 도착합니다.
+// - subscriptionsFile: 관심 키워드 목록 파일 (저장소에 저장)
+export const NOTIFY_CONFIG = {
+  server: 'https://ntfy.sh',
+  topicPrefix: 'policymoa-',
+  sendTime: '09:00',
+  maxItems: 10,
+  subscriptionsFile: 'alerts/subscriptions.json',
 };
 
 // 엑셀(CSV) 다운로드 항목. 날짜는 엑셀이 인식하도록 YYYY-MM-DD, 예산은 원 단위 숫자로 저장

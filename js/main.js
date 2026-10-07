@@ -14,6 +14,7 @@ import {
   PAGE_SIZE,
   RECOMMENDER,
   SEARCH_FIELDS,
+  NOTIFY_CONFIG,
   SIMILAR_LIMIT,
   STORAGE_KEYS,
 } from './config.js';
@@ -35,6 +36,7 @@ import { createSortSelect } from './components/sortSelect.js';
 import { createLoadMore } from './components/loadMore.js';
 import { createDetailModal } from './components/detailModal.js';
 import { createDeadlineAlert } from './components/deadlineAlert.js';
+import { createNotifySettings } from './components/notifySettings.js';
 
 const URL_OPTIONS = {
   categories: CATEGORIES,
@@ -177,6 +179,15 @@ async function init() {
     onOpenDetail: (id) => store.set({ detailId: id }),
     getSimilar: (policy) =>
       recommendSimilar(policy, policies, { provider: RECOMMENDER, limit: SIMILAR_LIMIT }),
+  });
+
+  const keywordField = SEARCH_FIELDS.find((field) => field.type === 'keyword');
+  createNotifySettings(document.getElementById('notify-settings'), {
+    policies,
+    keywordFields: keywordField?.fields ?? ['title', 'content'],
+    getCurrentKeyword: () => (keywordField ? store.get().filters[keywordField.key]?.trim() : ''),
+    storageKey: STORAGE_KEYS.notify,
+    config: NOTIFY_CONFIG,
   });
 
   const alert = createDeadlineAlert(document.getElementById('deadline-alert'), {

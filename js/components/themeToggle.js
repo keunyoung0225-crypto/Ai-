@@ -15,7 +15,7 @@ export function createThemeToggle(container, { storageKey }) {
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'theme-toggle';
+  button.className = 'header-button theme-toggle';
 
   function render() {
     button.textContent = `화면: ${LABELS[mode]}`;

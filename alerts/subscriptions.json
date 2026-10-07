@@ -1,0 +1,10 @@
+{
+  "subscriptions": [
+    {
+      "name": "운영자",
+      "topicEnv": "NTFY_TOPIC",
+      "keywords": ["청년 창업", "돌봄", "소상공인"],
+      "categories": []
+    }
+  ]
+}

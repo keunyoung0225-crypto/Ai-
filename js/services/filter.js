@@ -1,5 +1,16 @@
 // 검색·정렬 로직 (화면과 무관한 순수 함수).
 
+// 키워드 검색: fields 항목들에 띄어쓰기로 나눈 단어가 모두 들어 있으면 일치 (검색 화면·알림 공용)
+export function matchesKeyword(policy, query, fields) {
+  const words = (query ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return true;
+  const haystack = fields
+    .map((key) => policy[key] ?? '')
+    .join(' ')
+    .toLowerCase();
+  return words.every((word) => haystack.includes(word));
+}
+
 // 검색 필드 type별 일치 여부 판단: (공고의 해당 값, 검색 조건, 필드 정의, 공고 전체)
 const matchers = {
   text(value, query) {
@@ -10,13 +21,7 @@ const matchers = {
 
   // 여러 항목(field.fields)을 한꺼번에 검색. 띄어쓰기로 나눈 단어가 모두 들어 있어야 일치
   keyword(value, query, field, policy) {
-    const words = (query ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean);
-    if (!words.length) return true;
-    const haystack = field.fields
-      .map((key) => policy[key] ?? '')
-      .join(' ')
-      .toLowerCase();
-    return words.every((word) => haystack.includes(word));
+    return matchesKeyword(policy, query, field.fields);
   },
 
   select(value, selected) {
