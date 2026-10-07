@@ -48,6 +48,7 @@ jobs:
           # scripts/sources.json의 urlEnv·keyEnv와 같은 이름
           POLICY_SHEET_CSV_URL: ${{ secrets.POLICY_SHEET_CSV_URL }}
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          BIZINFO_API_KEY: ${{ secrets.BIZINFO_API_KEY }}
 
       - name: 바뀐 공고 데이터 저장
         if: ${{ !inputs.skip_update && !inputs.dry_run }}

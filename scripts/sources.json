@@ -18,6 +18,18 @@
       "days": 3,
       "category": "contract",
       "contractMethodIncludes": "수의"
+    },
+    {
+      "id": "mss",
+      "type": "bizinfo",
+      "name": "중소벤처기업부 지원사업 (기업마당)",
+      "enabled": false,
+      "keyEnv": "BIZINFO_API_KEY",
+      "category": "entrusted",
+      "agencyIncludes": [
+        "중소벤처기업부"
+      ],
+      "count": 500
     }
   ]
 }
