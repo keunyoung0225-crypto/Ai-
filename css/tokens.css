@@ -1,0 +1,126 @@
+/* 디자인 토큰: 색상·글꼴·간격은 이 파일에서만 정의합니다.
+   레이아웃 개념: 연한 하늘색 바탕 위에 공문서처럼 차분한 제목부(마스트헤드)와 흰 종이 같은 작업 면을 올림 */
+:root {
+  /* 바탕·면 */
+  --color-bg: #e8f3fb; /* 연한 하늘색 배경 */
+  --color-bg-deep: #d7e9f6; /* 제목부 아래쪽 띠 */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f8fc;
+  --color-border: #d6e3ef;
+  --color-border-strong: #b8cbde;
+
+  /* 글자 */
+  --color-ink: #0f2a46; /* 제목·선택 상태에 쓰는 남색 */
+  --color-text: #1a2d40;
+  --color-text-muted: #586b7e;
+
+  /* 강조 */
+  --color-primary: #1f63b0;
+  --color-primary-dark: #174f8e;
+  --color-primary-soft: #e2eefa;
+  --color-on-primary: #ffffff;
+  --color-on-ink: #ffffff;
+
+  /* 상태 */
+  --color-danger: #c8372d;
+  --color-danger-soft: #fdebe9;
+  --color-closed: #5f6b78;
+  --color-closed-soft: #eef1f4;
+  --color-star: #d99a00;
+  --color-new-bg: #fff1c7;
+  --color-new-text: #7a5300;
+  --color-alert-bg: #fff8e6;
+  --color-alert-border: #f0d9a0;
+  --color-overlay: rgba(12, 30, 52, 0.45);
+
+  /* 글꼴 */
+  --font-display: 'Noto Serif KR', 'Batang', serif;
+  --font-sans: 'IBM Plex Sans KR', 'Noto Sans KR', system-ui, -apple-system, 'Malgun Gothic', sans-serif;
+
+  /* 글자 크기 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 16px;
+  --text-lg: 18px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --shadow-card: 0 1px 2px rgba(15, 42, 70, 0.04), 0 4px 16px rgba(15, 42, 70, 0.04);
+  --shadow-pop: 0 18px 48px rgba(12, 30, 52, 0.22);
+  --container-width: 1200px;
+}
+
+/* 어두운 화면 모드: 기기 설정이 어두움이면 자동 적용, 화면 모드 버튼으로 직접 선택 가능 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0c1621;
+    --color-bg-deep: #0f1c2a;
+    --color-surface: #13212f;
+    --color-surface-muted: #182a3b;
+    --color-border: #24384c;
+    --color-border-strong: #33506b;
+    --color-ink: #e6eef7;
+    --color-text: #dbe5ef;
+    --color-text-muted: #98acc0;
+    --color-primary: #6aaef2;
+    --color-primary-dark: #8cc1f5;
+    --color-primary-soft: #1a3350;
+    --color-on-primary: #0b1826;
+    --color-on-ink: #0b1826;
+    --color-danger: #ff8f84;
+    --color-danger-soft: #45201d;
+    --color-closed: #a9b5c1;
+    --color-closed-soft: #23303d;
+    --color-star: #ffc94d;
+    --color-new-bg: #4a3a12;
+    --color-new-text: #ffd977;
+    --color-alert-bg: #2e2514;
+    --color-alert-border: #5c4a22;
+    --color-overlay: rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-pop: 0 18px 48px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #0c1621;
+  --color-bg-deep: #0f1c2a;
+  --color-surface: #13212f;
+  --color-surface-muted: #182a3b;
+  --color-border: #24384c;
+  --color-border-strong: #33506b;
+  --color-ink: #e6eef7;
+  --color-text: #dbe5ef;
+  --color-text-muted: #98acc0;
+  --color-primary: #6aaef2;
+  --color-primary-dark: #8cc1f5;
+  --color-primary-soft: #1a3350;
+  --color-on-primary: #0b1826;
+  --color-on-ink: #0b1826;
+  --color-danger: #ff8f84;
+  --color-danger-soft: #45201d;
+  --color-closed: #a9b5c1;
+  --color-closed-soft: #23303d;
+  --color-star: #ffc94d;
+  --color-new-bg: #4a3a12;
+  --color-new-text: #ffd977;
+  --color-alert-bg: #2e2514;
+  --color-alert-border: #5c4a22;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 18px 48px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}

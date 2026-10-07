@@ -1,0 +1,87 @@
+# 매일 아침 공고 데이터 갱신 + 관심 키워드 휴대폰 알림 (오전 9시 도착)
+# 설정 방법은 README의 '공고 데이터 매일 갱신', '휴대폰 알림' 참고
+name: 매일 공고 갱신·알림
+
+on:
+  schedule:
+    # 매일 08:30(한국 시각) 실행. 알림은 ntfy 예약 발송으로 09:00에 도착
+    # GitHub 예약 실행은 몇 분~수십 분 늦을 수 있어 미리 실행합니다.
+    - cron: '30 23 * * *'
+  workflow_dispatch:
+    inputs:
+      since:
+        description: '알림: 이 날짜부터 올라온 공고로 시험 발송 (YYYY-MM-DD, 비우면 오늘 새로 들어온 공고)'
+        required: false
+      skip_update:
+        description: '공고 데이터 갱신 건너뛰기'
+        type: boolean
+        default: false
+      dry_run:
+        description: '저장·발송하지 않고 결과만 확인'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # 갱신한 공고 데이터를 저장소에 저장
+  pages: write # 사이트(GitHub Pages) 다시 만들기 요청
+
+# 같은 작업이 겹쳐 실행되지 않도록
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    env:
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 공고 데이터 갱신
+        if: ${{ !inputs.skip_update }}
+        run: node scripts/update-data.mjs
+        env:
+          # scripts/sources.json의 urlEnv·keyEnv와 같은 이름
+          POLICY_SHEET_CSV_URL: ${{ secrets.POLICY_SHEET_CSV_URL }}
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+
+      - name: 바뀐 공고 데이터 저장
+        if: ${{ !inputs.skip_update && !inputs.dry_run }}
+        id: commit
+        run: |
+          if git diff --quiet -- data/policies.json; then
+            echo "바뀐 공고가 없습니다."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/policies.json
+            git commit -m "공고 데이터 갱신 ($(TZ=Asia/Seoul date +%F))"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 사이트 다시 만들기 요청
+        if: ${{ steps.commit.outputs.changed == 'true' }}
+        # Pages를 쓰지 않거나 이미 자동으로 만들어지는 경우 실패해도 무시
+        continue-on-error: true
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: 관심 키워드 알림 발송
+        run: node scripts/notify.mjs --new-ids .cache/new-policies.json
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          # 알림 받을 사람을 늘리려면: Secrets에 NTFY_TOPIC_2 등을 추가하고 아래에도 한 줄 추가
+          # NTFY_TOPIC_2: ${{ secrets.NTFY_TOPIC_2 }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          NTFY_SERVER: ${{ vars.NTFY_SERVER }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          SINCE: ${{ inputs.since }}
+          # 수동 실행은 예약 없이 바로 발송
+          SEND_NOW: ${{ github.event_name == 'workflow_dispatch' }}

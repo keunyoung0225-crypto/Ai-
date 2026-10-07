@@ -1,0 +1,13 @@
+{
+  "name": "policy-moa",
+  "private": true,
+  "type": "module",
+  "description": "2026년 모아보는 정책한눈 - 정책 공고 검색 웹앱",
+  "scripts": {
+    "notify": "node scripts/notify.mjs",
+    "notify:dry": "node scripts/notify.mjs --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
