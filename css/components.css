@@ -1767,10 +1767,24 @@ body:has(.detail-modal[open]) {
     z-index: 20;
     display: flex;
     justify-content: center;
-    padding: var(--space-2) 48px calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+    gap: 6px;
+    padding: var(--space-2) 44px calc(var(--space-2) + env(safe-area-inset-bottom, 0px)) var(--space-2);
     border-top: 1px solid var(--color-border);
     background: var(--color-surface);
     box-shadow: 0 -4px 16px rgba(15, 42, 70, 0.08);
+  }
+
+  /* 화면이 좁으면 비율을 지킨 채 줄어듦 (이미지가 잘리지 않게) */
+  .ad-slot--bottom .ad-slot__frame {
+    height: auto;
+    aspect-ratio: var(--ad-ratio);
+  }
+
+  .ad-slot__tag--outside {
+    position: static;
+    flex: none;
+    align-self: center;
+    border: 1px solid var(--color-border);
   }
 
   .ad-slot--bottom .ad-slot__placeholder {

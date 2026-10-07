@@ -180,6 +180,8 @@ export const EXPORT_FIELDS = [
 // - enabled를 false로 하면 그 광고 영역을 숨깁니다.
 // - resizable: true면 광고 틀 아래 손잡이를 끌어(또는 키보드 ↑↓) 세로 높이를 minHeight~maxHeight 사이에서 조절할 수 있습니다.
 //   조절한 높이는 이 브라우저에 기억되고(storageKey), 손잡이를 두 번 누르면 height(기본 높이)로 돌아갑니다.
+// - labelOutside: true면 '광고' 표시를 이미지 위가 아닌 틀 왼쪽 바깥에 둡니다. (작은 띠 광고의 글자가 가려지지 않게)
+// - 화면이 광고보다 좁으면 가로세로 비율을 지킨 채 작게 줄어듭니다. (휴대폰 아래 광고)
 export const AD_SLOTS = {
   side: {
     enabled: true,
@@ -193,7 +195,16 @@ export const AD_SLOTS = {
     linkUrl: 'https://www.forest.go.kr',
     alt: '산림청 홈페이지 산불조심',
   },
-  bottom: { enabled: true, width: 320, height: 50, imageUrl: '', linkUrl: '', alt: '', closable: true },
+  bottom: {
+    enabled: true,
+    width: 320,
+    height: 50,
+    imageUrl: 'images/ad-bottom.jpg',
+    linkUrl: 'https://www.forest.go.kr',
+    alt: '산불조심, 산불 발견 시 즉시 119·112 신고',
+    closable: true,
+    labelOutside: true,
+  },
 };
 
 // 상세 보기의 '비슷한 공고' 추천: 'rule'(규칙 기반) | 'ai'(AI 서버 연결 후 사용)
