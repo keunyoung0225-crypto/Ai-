@@ -146,15 +146,22 @@ export const STORAGE_KEYS = {
 // '최근 검색 공고'에 보여줄 공고 수 (마지막으로 검색한 키워드 기준)
 export const RECENT_SEARCH_LIMIT = 3;
 
-// 휴대폰 알림 (무료 앱 ntfy 사용). 매일 아침 GitHub Actions가 scripts/notify.mjs를 실행해 발송합니다.
-// - sendTime: 알림이 도착할 한국 시각. 작업은 그보다 먼저 실행되고 ntfy 예약 발송으로 이 시각에 도착합니다.
+// 휴대폰 알림. 매일 아침 GitHub Actions가 scripts/notify.mjs를 실행해 발송합니다.
+// 두 가지 방법을 함께 쓸 수 있습니다: 앱 알림(PWA 웹 푸시, 추천) / 무료 앱 ntfy
+// - sendTime: 알림이 도착할 한국 시각. 작업은 그보다 먼저 실행되고 이 시각에 맞춰 보냅니다.
 // - subscriptionsFile: 관심 키워드 목록 파일 (저장소에 저장)
+// - webPush.vapidPublicKey: 앱 알림용 '공개 키'. 사이트의 '휴대폰 알림' 창에서 만든 공개 키를 붙여 넣습니다.
+//   (공개 키는 누구에게 보여도 괜찮습니다. 짝이 되는 '비밀 키'는 GitHub Secrets에만 넣으세요)
 export const NOTIFY_CONFIG = {
   server: 'https://ntfy.sh',
   topicPrefix: 'policymoa-',
   sendTime: '09:00',
   maxItems: 10,
   subscriptionsFile: 'alerts/subscriptions.json',
+  webPush: {
+    vapidPublicKey: '',
+    subscriptionsEnv: 'WEB_PUSH_SUBSCRIPTIONS',
+  },
 };
 
 // 엑셀(CSV) 다운로드 항목. 날짜는 엑셀이 인식하도록 YYYY-MM-DD, 예산은 원 단위 숫자로 저장

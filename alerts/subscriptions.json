@@ -2,8 +2,13 @@
   "subscriptions": [
     {
       "name": "운영자",
+      "webPushEnv": "WEB_PUSH_SUBSCRIPTIONS",
       "topicEnv": "NTFY_TOPIC",
-      "keywords": ["청년 창업", "돌봄", "소상공인"],
+      "keywords": [
+        "청년 창업",
+        "돌봄",
+        "소상공인"
+      ],
       "categories": []
     }
   ]

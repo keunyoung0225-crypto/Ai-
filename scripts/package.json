@@ -1,0 +1,9 @@
+{
+  "name": "policy-moa-scripts",
+  "private": true,
+  "type": "module",
+  "description": "매일 공고 갱신·알림 스크립트용 패키지 (사이트 화면에는 쓰이지 않음)",
+  "dependencies": {
+    "web-push": "3.6.7"
+  }
+}

@@ -50,6 +50,7 @@ import { createRegionExplorer } from './components/regionExplorer.js';
 import { renderAdSlot } from './components/adSlot.js';
 import { KOREA_MAP_PATHS, KOREA_MAP_VIEWBOX } from './data/koreaMap.js';
 import { regionLabel } from './services/regions.js';
+import { registerServiceWorker } from './services/webPush.js';
 
 const URL_OPTIONS = {
   categories: CATEGORIES,
@@ -103,6 +104,8 @@ function createDataRepository() {
 }
 
 async function init() {
+  // 앱 설치(홈 화면에 추가)·휴대폰 알림을 위한 서비스 워커 (실패해도 화면은 그대로)
+  registerServiceWorker();
   // 광고 영역 (데이터를 불러오지 못해도 표시)
   renderAdSlot(document.getElementById('ad-side'), AD_SLOTS.side);
   document.body.classList.toggle('has-bottom-ad', Boolean(AD_SLOTS.bottom?.enabled));

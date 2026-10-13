@@ -40,6 +40,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
 
       - name: 공고 데이터 갱신
         if: ${{ !inputs.skip_update }}
@@ -74,9 +76,19 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: 알림 발송 도구 설치
+        run: npm ci --prefix scripts --no-audit --no-fund
+
       - name: 관심 키워드 알림 발송
+        # 앱 알림(PWA)은 예약 발송이 없어, 이 단계가 09:00까지 기다렸다가 보냅니다.
         run: node scripts/notify.mjs --new-ids .cache/new-policies.json
         env:
+          # 앱 알림(PWA): 사이트 '휴대폰 알림' 창에서 만든 키와 기기별 구독 정보
+          WEB_PUSH_SUBSCRIPTIONS: ${{ secrets.WEB_PUSH_SUBSCRIPTIONS }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
+          # ntfy 앱 알림 (선택)
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           # 알림 받을 사람을 늘리려면: Secrets에 NTFY_TOPIC_2 등을 추가하고 아래에도 한 줄 추가
           # NTFY_TOPIC_2: ${{ secrets.NTFY_TOPIC_2 }}
