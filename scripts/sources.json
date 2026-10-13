@@ -13,7 +13,7 @@
       "id": "nara",
       "type": "naraBid",
       "name": "나라장터 수의계약 공고",
-      "enabled": false,
+      "enabled": true,
       "keyEnv": "DATA_GO_KR_KEY",
       "days": 3,
       "category": "contract",
