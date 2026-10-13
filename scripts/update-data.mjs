@@ -106,9 +106,11 @@ async function main() {
       report.push(`| ${label} | ${items.length} | ${added} | ${changed} | 성공${note} |`);
     } catch (error) {
       failed += 1;
-      console.error(`✘ ${label}: ${error.message}`);
-      console.log(`::warning title=공고 수집 실패::${label}: ${error.message}`);
-      report.push(`| ${label} | - | - | - | 실패: ${error.message} |`);
+      // 오류 문구의 줄바꿈·'|'가 요약 표를 깨뜨리지 않도록 한 줄로 정리
+      const message = String(error.message).replace(/\s+/g, ' ').replace(/\|/g, '/').trim();
+      console.error(`✘ ${label}: ${message}`);
+      console.log(`::warning title=공고 수집 실패::${label}: ${message}`);
+      report.push(`| ${label} | - | - | - | 실패: ${message} |`);
     }
   }
 

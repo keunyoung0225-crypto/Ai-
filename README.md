@@ -152,7 +152,7 @@ templates/policies-template.csv  공고 입력용 표 양식
 3. 그 주소를 Secret `POLICY_SHEET_CSV_URL`로 등록하고 `sources.json`의 `sheet`를 켭니다.
 
 **나라장터 API 연결**
-1. 공공데이터포털(data.go.kr)에서 **조달청_나라장터 입찰공고정보서비스** 활용 신청을 하고 인증키(일반 인증키, Decoding)를 받습니다.
+1. 공공데이터포털(data.go.kr)에서 **조달청_나라장터 입찰공고정보서비스** 활용 신청을 하고 인증키를 받습니다. (화면의 Encoding·Decoding 키 중 어느 쪽을 넣어도 됩니다)
 2. 인증키를 Secret `DATA_GO_KR_KEY`로 등록하고 `sources.json`의 `nara`를 켭니다.
 3. 계약 방법에 "수의"가 들어간 공고만 `수의계약`으로 가져옵니다. (`contractMethodIncludes`로 변경)
 
