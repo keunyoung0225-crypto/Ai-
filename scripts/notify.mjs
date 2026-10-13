@@ -25,11 +25,11 @@ import path from 'node:path';
 import { API_CONFIG, APP_SHORT_TITLE, DATA_URL, NOTIFY_CONFIG, SEARCH_FIELDS } from '../js/config.js';
 import { adapters } from '../js/data/adapters/index.js';
 import { standardAdapter } from '../js/data/adapters/standard.js';
-import { buildDigest, findAlertMatches, parseKeywords } from '../js/services/alerts.js';
+import { buildDigest, buildKeywordAlerts, findAlertMatches, parseKeywords } from '../js/services/alerts.js';
 import { isDateString } from '../js/services/date.js';
 import { publishNtfy } from '../js/services/ntfy.js';
 import { addDays, koreaDate } from './lib/dates.js';
-import { parseWebPushSubscriptions, sendWebPush, webPushBody } from './lib/webPush.js';
+import { parseWebPushSubscriptions, sendWebPush } from './lib/webPush.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -188,7 +188,8 @@ async function main() {
         webPushJobs.push({
           name: sub.name,
           targets,
-          payload: { title: digest.title, body: webPushBody(matches), url: digest.click, tag: 'policy-digest' },
+          // 키워드마다 알림 한 건씩 (제목에 키워드 표시)
+          payloads: buildKeywordAlerts(matches, sub.keywords, { siteUrl: env.SITE_URL || undefined }),
         });
       } catch (error) {
         console.error(`[${sub.name}] ${sub.webPushEnv}를 읽지 못했습니다: ${error.message}`);
@@ -206,16 +207,20 @@ async function main() {
     } else {
       if (delay) await waitUntil(delay);
       for (const job of webPushJobs) {
-        const result = await sendWebPush(job.targets, job.payload, { ...keys, subject: vapidSubject(env) });
-        console.log(`[${job.name}] 앱 알림: 기기 ${job.targets.length}대 중 ${result.sent}대 발송`);
-        result.expired.forEach((index) => {
+        const expired = new Set();
+        for (const payload of job.payloads) {
+          const result = await sendWebPush(job.targets, payload, { ...keys, subject: vapidSubject(env) });
+          console.log(`[${job.name}] 앱 알림 "${payload.title}": 기기 ${job.targets.length}대 중 ${result.sent}대 발송`);
+          result.expired.forEach((index) => expired.add(index));
+          result.errors.forEach((message) => console.error(`[${job.name}] 앱 알림 발송 실패: ${message}`));
+          failures += result.errors.length;
+        }
+        expired.forEach((index) => {
           console.log(
             `::warning title=앱 알림 구독 만료::[${job.name}] ${index + 1}번째 기기의 구독이 만료됐습니다. ` +
               '그 기기에서 사이트의 휴대폰 알림 창을 열어 알림을 다시 켜고, 새 구독 정보로 Secret을 바꿔 주세요.',
           );
         });
-        result.errors.forEach((message) => console.error(`[${job.name}] 앱 알림 발송 실패: ${message}`));
-        failures += result.errors.length;
       }
     }
   }

@@ -1,6 +1,6 @@
 // 휴대폰 알림 설정 창: 관심 키워드를 정하고, 이 기기에서 앱 알림(PWA 웹 푸시)을 켜거나
 // ntfy 앱 알림을 시험하고, 매일 아침 발송에 쓸 설정(alerts/subscriptions.json 내용)을 만들어 줍니다.
-import { buildDigest, findAlertMatches, parseKeywords } from '../services/alerts.js';
+import { buildDigest, buildKeywordAlerts, findAlertMatches, parseKeywords } from '../services/alerts.js';
 import { isValidTopic, publishNtfy, randomTopic } from '../services/ntfy.js';
 import { readJson, writeJson } from '../services/storage.js';
 import {
@@ -311,10 +311,18 @@ export function createNotifySettings(
 
   previewButton.addEventListener('click', async () => {
     const list = keywords();
-    const digest = digestFor(list, { maxItems: 3, titlePrefix: `[미리보기] ${appName}` });
+    // 매일 아침 알림과 같은 모양: 키워드마다 한 건 (지금 데이터 기준)
+    const matches = findAlertMatches(policies, { keywords: list }, keywordFields);
+    const alerts = buildKeywordAlerts(matches, list, { titleSuffix: ' (미리보기)' });
     try {
-      await showPreview({ title: digest.title, body: digest.message });
-      pushStatus.textContent = '미리보기 알림을 보냈습니다. 실제 알림은 매일 아침 이런 모양으로 옵니다.';
+      if (!alerts.length) {
+        await showPreview({
+          title: `${appName} (미리보기)`,
+          body: list.length ? `키워드 "${list.join(', ')}"에 맞는 공고가 아직 없습니다.` : '관심 키워드를 입력하세요.',
+        });
+      }
+      for (const alert of alerts) await showPreview(alert);
+      pushStatus.textContent = `미리보기 알림 ${Math.max(alerts.length, 1)}건을 보냈습니다. 실제 알림은 매일 아침 키워드마다 이런 모양으로 옵니다.`;
     } catch (error) {
       pushStatus.textContent = error.message;
     }
