@@ -96,14 +96,14 @@ export function subscriptionText(subscription) {
 }
 
 // 이 기기에 알림이 어떻게 보이는지 미리보기 (실제 발송은 매일 아침 GitHub Actions가 함)
-export async function showPreview({ title, body }) {
+export async function showPreview({ title, body, url, tag }) {
   const registration = await readyRegistration();
   await registration.showNotification(title, {
     body,
     icon: 'images/icon-192.png',
     badge: 'images/badge-96.png',
-    tag: 'policy-preview',
-    data: { url: registration.scope },
+    tag: `preview-${tag ?? 'policy'}`,
+    data: { url: new URL(url || './', registration.scope).href },
   });
 }
 

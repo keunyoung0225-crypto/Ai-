@@ -1,8 +1,6 @@
 // 앱 알림(PWA 웹 푸시) 보내기 — scripts/notify.mjs에서 사용
 // 보내는 데 필요한 web-push 패키지는 scripts 폴더에 설치합니다. (npm ci --prefix scripts)
 
-const BODY_ITEMS = 5; // 알림 본문에 보여 줄 공고 수 (휴대폰 알림은 길면 잘리므로 짧게)
-const TITLE_LIMIT = 60;
 const TTL_SECONDS = 12 * 60 * 60; // 휴대폰이 꺼져 있어도 12시간 안에 켜지면 전달
 
 // 사이트에서 복사한 구독 정보: 기기마다 한 줄(JSON), 또는 JSON 배열
@@ -28,16 +26,6 @@ export function parseWebPushSubscriptions(text) {
     }
   });
   return list;
-}
-
-// 알림 본문: 공고 제목 위주로 짧게
-export function webPushBody(matches) {
-  const lines = matches.slice(0, BODY_ITEMS).map(({ policy }) => {
-    const title = policy.title.length > TITLE_LIMIT ? `${policy.title.slice(0, TITLE_LIMIT)}…` : policy.title;
-    return `• ${title}`;
-  });
-  if (matches.length > BODY_ITEMS) lines.push(`외 ${matches.length - BODY_ITEMS}건`);
-  return lines.join('\n');
 }
 
 // 기기마다 보내고 결과를 돌려줌: { sent, expired: [기기 순서], errors: [메시지] }
