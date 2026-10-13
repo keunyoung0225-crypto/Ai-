@@ -5,7 +5,7 @@
       "webPushEnv": "WEB_PUSH_SUBSCRIPTIONS",
       "topicEnv": "NTFY_TOPIC",
       "keywords": [
-        "아동급식"
+        "아동급식",
         "돌봄"
       ],
       "categories": []
