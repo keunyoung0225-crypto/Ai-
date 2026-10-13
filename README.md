@@ -46,10 +46,18 @@ python3 -m http.server 8000
 2. **Source**: `Deploy from a branch`, **Branch**: 배포할 브랜치 / `/ (root)` 선택 후 Save
 3. 잠시 후 `https://<사용자명>.github.io/<저장소명>/` 에서 확인
 
+## 링크 미리보기 (카카오톡·문자·SNS)
+링크를 보내면 제목·설명과 함께 `images/og-image.jpg`(1200×630) 이미지가 미리보기로 나옵니다.
+- 설정은 `index.html` 위쪽의 `og:` 줄들입니다. **사이트 주소가 바뀌면** 그 안의 `https://moaba-nine.vercel.app` 를 새 주소로 바꾸세요.
+- 이미지를 바꾸려면 같은 이름(1200×630, 1MB 이하 권장)으로 덮어쓰면 됩니다.
+- 카카오톡은 미리보기를 한동안 저장해 두므로, 바꾼 뒤에도 옛 모양이 나오면
+  [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에서 주소를 넣고 **캐시 초기화**를 누르세요.
+
 ## 폴더 구조
 ```
 index.html              페이지 뼈대
 manifest.webmanifest    앱 설치 정보 (이름·아이콘·색)
+images/og-image.jpg     링크 미리보기 이미지 (1200×630)
 sw.js                   서비스 워커: 사이트가 닫혀 있어도 알림을 받아 표시
 css/tokens.css          색상·글꼴·간격 변수 (배경 하늘색 등)
 css/base.css            기본 레이아웃
