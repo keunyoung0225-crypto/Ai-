@@ -12,6 +12,10 @@
 //   NTFY_TOPIC        알림 주제 이름 (subscriptions.json의 topicEnv로 다른 이름도 사용 가능)
 //   NTFY_SERVER       ntfy 서버 주소 (기본: config.js의 NOTIFY_CONFIG.server)
 //   NTFY_TOKEN        보호된 주제용 접근 토큰 (선택)
+//   WEB_PUSH_SUBSCRIPTIONS  앱 알림(PWA) 구독 정보. 사이트 '휴대폰 알림' 창에서 복사한 내용, 기기마다 한 줄
+//                     (subscriptions.json의 webPushEnv로 다른 이름도 사용 가능)
+//   VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY  앱 알림 키 (사이트 '휴대폰 알림' 창에서 만듦)
+//   VAPID_SUBJECT     앱 알림 보내는 곳 연락처 (선택, 기본: SITE_URL 또는 이 저장소 주소)
 //   SITE_URL          알림을 눌렀을 때 열 사이트 주소 (선택)
 //   POLICY_DATA_URL   공고 데이터를 받아올 주소 (선택, 없으면 data/policies.json 사용)
 //   SINCE, DRY_RUN, SEND_NOW, NEW_IDS_FILE   위 옵션과 같은 뜻 (GitHub Actions용)
@@ -25,6 +29,7 @@ import { buildDigest, findAlertMatches, parseKeywords } from '../js/services/ale
 import { isDateString } from '../js/services/date.js';
 import { publishNtfy } from '../js/services/ntfy.js';
 import { addDays, koreaDate } from './lib/dates.js';
+import { parseWebPushSubscriptions, sendWebPush, webPushBody } from './lib/webPush.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -70,6 +75,7 @@ async function loadSubscriptions() {
     .map((sub, index) => ({
       name: sub.name || `구독 ${index + 1}`,
       topicEnv: sub.topicEnv || 'NTFY_TOPIC',
+      webPushEnv: sub.webPushEnv || NOTIFY_CONFIG.webPush?.subscriptionsEnv || 'WEB_PUSH_SUBSCRIPTIONS',
       keywords: parseKeywords((sub.keywords ?? []).join('\n')),
       categories: Array.isArray(sub.categories) ? sub.categories : [],
     }))
@@ -80,6 +86,26 @@ async function loadSubscriptions() {
 function scheduledDelay(today, now) {
   const target = new Date(`${today}T${NOTIFY_CONFIG.sendTime}:00+09:00`);
   return target - now > 15_000 ? Math.floor(target / 1000) : undefined;
+}
+
+// 앱 알림은 예약 발송이 없으므로 도착 시각까지 기다렸다가 보냄 (최대 MAX_WAIT_MINUTES분)
+const MAX_WAIT_MINUTES = 60;
+async function waitUntil(seconds) {
+  const ms = seconds * 1000 - Date.now();
+  if (ms <= 0) return;
+  if (ms > MAX_WAIT_MINUTES * 60_000) {
+    console.log(`도착 시각까지 ${MAX_WAIT_MINUTES}분보다 많이 남아 기다리지 않고 바로 보냅니다.`);
+    return;
+  }
+  console.log(`앱 알림은 ${NOTIFY_CONFIG.sendTime}에 맞춰 보내기 위해 ${Math.ceil(ms / 60_000)}분 기다립니다…`);
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function vapidSubject(env) {
+  if (env.VAPID_SUBJECT) return env.VAPID_SUBJECT;
+  if (/^https:\/\//.test(env.SITE_URL ?? '')) return env.SITE_URL;
+  if (env.GITHUB_REPOSITORY) return `${env.GITHUB_SERVER_URL || 'https://github.com'}/${env.GITHUB_REPOSITORY}`;
+  return 'https://github.com';
 }
 
 async function main() {
@@ -109,6 +135,7 @@ async function main() {
   );
 
   let failures = 0;
+  const webPushJobs = [];
   for (const sub of subscriptions) {
     const matches = findAlertMatches(
       candidates,
@@ -129,24 +156,67 @@ async function main() {
     }
 
     const topic = env[sub.topicEnv];
-    if (!topic) {
-      console.error(`알림 주제가 없습니다. GitHub 저장소 Secrets에 ${sub.topicEnv}를 등록하세요.`);
+    const pushText = env[sub.webPushEnv]?.trim();
+    if (!topic && !pushText) {
+      console.error(
+        `알림 받을 곳이 없습니다. GitHub 저장소 Secrets에 ${sub.webPushEnv}(앱 알림) 또는 ${sub.topicEnv}(ntfy)를 등록하세요.`,
+      );
       failures += 1;
       continue;
     }
-    try {
-      await publishNtfy({
-        server: env.NTFY_SERVER || NOTIFY_CONFIG.server,
-        topic,
-        token: env.NTFY_TOKEN || undefined,
-        tags: ['bell'],
-        delay,
-        ...digest,
-      });
-      console.log(delay ? `예약 발송 완료 (${NOTIFY_CONFIG.sendTime} 도착)` : '발송 완료');
-    } catch (error) {
-      console.error(`발송 실패: ${error.message}`);
+
+    if (topic) {
+      try {
+        await publishNtfy({
+          server: env.NTFY_SERVER || NOTIFY_CONFIG.server,
+          topic,
+          token: env.NTFY_TOKEN || undefined,
+          tags: ['bell'],
+          delay,
+          ...digest,
+        });
+        console.log(delay ? `ntfy 예약 발송 완료 (${NOTIFY_CONFIG.sendTime} 도착)` : 'ntfy 발송 완료');
+      } catch (error) {
+        console.error(`ntfy 발송 실패: ${error.message}`);
+        failures += 1;
+      }
+    }
+
+    if (pushText) {
+      try {
+        const targets = parseWebPushSubscriptions(pushText);
+        webPushJobs.push({
+          name: sub.name,
+          targets,
+          payload: { title: digest.title, body: webPushBody(matches), url: digest.click, tag: 'policy-digest' },
+        });
+      } catch (error) {
+        console.error(`[${sub.name}] ${sub.webPushEnv}를 읽지 못했습니다: ${error.message}`);
+        failures += 1;
+      }
+    }
+  }
+
+  // 앱 알림(웹 푸시) 발송: 도착 시각에 맞춰 기다렸다가 기기마다 보냄
+  if (webPushJobs.length) {
+    const keys = { publicKey: env.VAPID_PUBLIC_KEY?.trim(), privateKey: env.VAPID_PRIVATE_KEY?.trim() };
+    if (!keys.publicKey || !keys.privateKey) {
+      console.error('앱 알림 키가 없습니다. GitHub 저장소 Secrets에 VAPID_PUBLIC_KEY와 VAPID_PRIVATE_KEY를 등록하세요.');
       failures += 1;
+    } else {
+      if (delay) await waitUntil(delay);
+      for (const job of webPushJobs) {
+        const result = await sendWebPush(job.targets, job.payload, { ...keys, subject: vapidSubject(env) });
+        console.log(`[${job.name}] 앱 알림: 기기 ${job.targets.length}대 중 ${result.sent}대 발송`);
+        result.expired.forEach((index) => {
+          console.log(
+            `::warning title=앱 알림 구독 만료::[${job.name}] ${index + 1}번째 기기의 구독이 만료됐습니다. ` +
+              '그 기기에서 사이트의 휴대폰 알림 창을 열어 알림을 다시 켜고, 새 구독 정보로 Secret을 바꿔 주세요.',
+          );
+        });
+        result.errors.forEach((message) => console.error(`[${job.name}] 앱 알림 발송 실패: ${message}`));
+        failures += result.errors.length;
+      }
     }
   }
 

@@ -1411,6 +1411,54 @@ body:has(.detail-modal[open]) {
   font-size: var(--text-sm);
 }
 
+/* 숨김 표시가 다른 표시 방식(display)에 가려지지 않도록 */
+.notify-panel [hidden] {
+  display: none !important;
+}
+
+.notify-status {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 안내 상자 (아이폰 홈 화면 추가, 알림 키 만들기) */
+.notify-callout,
+.notify-keys,
+.notify-subscription {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.notify-callout {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.notify-warning {
+  color: var(--color-danger);
+}
+
+/* 다른 방법(ntfy) 접기·펼치기 */
+.notify-details {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.notify-details > summary {
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notify-details > * + * {
+  margin-top: var(--space-3);
+}
+
 /* ==========================================================
    반응형
    ========================================================== */
