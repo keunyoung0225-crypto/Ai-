@@ -159,7 +159,7 @@ export const NOTIFY_CONFIG = {
   maxItems: 10,
   subscriptionsFile: 'alerts/subscriptions.json',
   webPush: {
-    vapidPublicKey: '',
+    vapidPublicKey: 'BH_t_b4FP4bX2TpSZzQbboyZsY_e3XsnH_-28Wda0OiXO293tK-KxF81FWIJTnBvoMTPnRPjh2Gqf1ARXG9xmas',
     subscriptionsEnv: 'WEB_PUSH_SUBSCRIPTIONS',
   },
 };
