@@ -57,6 +57,8 @@ python3 -m http.server 8000
 ```
 index.html              페이지 뼈대
 manifest.webmanifest    앱 설치 정보 (이름·아이콘·색)
+images/logo.svg         로고 (공고 카드 네 장이 모이고 하나에 체크 → '모아보는 정책')
+images/icon-*.png       앱·탭 아이콘 (logo.svg로 만든 그림), badge-96.png는 알림 표시줄용
 images/og-image.jpg     링크 미리보기 이미지 (1200×630)
 sw.js                   서비스 워커: 사이트가 닫혀 있어도 알림을 받아 표시
 css/tokens.css          색상·글꼴·간격 변수 (배경 하늘색 등)

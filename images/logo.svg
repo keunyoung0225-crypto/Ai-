@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="정책한눈 로고">
+  <!-- 정책한눈 로고(모아보기): 흩어진 공고 카드 네 장이 모이고, 그중 하나가 내게 맞는 공고(체크) -->
+  <rect width="120" height="120" rx="28" fill="#0f2a46"/>
+  <rect x="24" y="24" width="32" height="32" rx="8" fill="#cde2fb" fill-opacity=".55"/>
+  <rect x="64" y="24" width="32" height="32" rx="8" fill="#cde2fb" fill-opacity=".8"/>
+  <rect x="24" y="64" width="32" height="32" rx="8" fill="#cde2fb" fill-opacity=".8"/>
+  <rect x="64" y="64" width="32" height="32" rx="8" fill="#5598e7"/>
+  <path d="M72 80 l7 7 l11 -14" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

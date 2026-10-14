@@ -33,18 +33,25 @@
   letter-spacing: 0.02em;
 }
 
+/* 로고(images/logo.svg): 공고 카드 네 장이 모이고 그중 하나에 체크 → '모아보는 정책' */
 .site-brand__mark {
-  display: inline-grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-sm);
-  background: var(--color-ink);
-  color: var(--color-on-ink);
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  display: block;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+/* 어두운 화면에서는 로고 배경(남색)이 묻히지 않도록 옅은 테두리 */
+:root[data-theme="dark"] .site-brand__mark {
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .site-brand__mark {
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+  }
 }
 
 .site-header__tools {
