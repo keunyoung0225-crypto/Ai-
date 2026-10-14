@@ -1,4 +1,5 @@
 // 검색·정렬 로직 (화면과 무관한 순수 함수).
+import { deadlineStatus } from './date.js';
 
 // 키워드 검색: fields 항목들에 띄어쓰기로 나눈 단어가 모두 들어 있으면 일치 (검색 화면·알림 공용)
 export function matchesKeyword(policy, query, fields) {
@@ -39,12 +40,25 @@ const matchers = {
   },
 };
 
-// region: 지역 id ('' 또는 없으면 전체)
-export function filterPolicies(policies, { category, filters, region }, fields) {
+// 접수 상태 조건: '' 전체 | 'open' 접수 중(마감일이 오늘 이후) | 'closing' 마감 임박(warningDays일 이내)
+// (마감일이 없는 상시 공고는 접수 중·마감 임박에 넣지 않음 — 첫 화면 숫자와 같은 기준)
+export const STATUS_LABELS = { open: '접수 중', closing: '마감 임박' };
+
+export function matchesStatus(policy, status, warningDays = 7) {
+  if (!status) return true;
+  const result = deadlineStatus(policy.deadline, warningDays);
+  if (status === 'open') return Boolean(result) && result.tone !== 'closed';
+  if (status === 'closing') return result?.tone === 'urgent';
+  return true;
+}
+
+// region: 지역 id ('' 또는 없으면 전체), status: 접수 상태 (위 matchesStatus)
+export function filterPolicies(policies, { category, filters, region, status }, fields, { warningDays } = {}) {
   return policies.filter(
     (policy) =>
       (category === 'all' || policy.category === category) &&
       (!region || policy.region === region) &&
+      matchesStatus(policy, status, warningDays) &&
       fields.every((field) =>
         matchers[field.type](policy[field.key], filters[field.key], field, policy),
       ),

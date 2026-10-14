@@ -25,7 +25,7 @@ import {
 } from './config.js';
 import { createStore, createEmptyFilters } from './state.js';
 import { createRepository } from './data/repository.js';
-import { filterPolicies, matchesKeyword, sortPolicies, uniqueValues } from './services/filter.js';
+import { STATUS_LABELS, filterPolicies, matchesKeyword, sortPolicies, uniqueValues } from './services/filter.js';
 import { readValue, writeValue } from './services/storage.js';
 import { readUrlState, writeUrlState } from './services/urlState.js';
 import { deadlineStatus, isDateString, todayString } from './services/date.js';
@@ -145,10 +145,13 @@ async function init() {
   }
   const { policies } = loaded;
   document.getElementById('data-notice').textContent = dataNotice(loaded);
-  renderSummaryStats(document.getElementById('summary-stats'), policies, {
+  // 위쪽 숫자(전체 공고·접수 중·마감 임박)를 누르면 다른 조건을 모두 풀고 그 공고만 목록에 보여 줌
+  const summaryStats = renderSummaryStats(document.getElementById('summary-stats'), policies, {
     deadlineWarningDays: DEADLINE_WARNING_DAYS,
+    onSelect: (status) => showStatus(status),
   });
   const policiesById = new Map(policies.map((policy) => [policy.id, policy]));
+  const filterOptions = { warningDays: DEADLINE_WARNING_DAYS };
 
   // select 검색 필드의 선택지는 데이터에서 자동 추출
   const selectOptions = Object.fromEntries(
@@ -290,22 +293,68 @@ async function init() {
     onSelect: (region) => store.set({ region, visibleCount: PAGE_SIZE }),
     onOpenDetail: (id) => store.set({ detailId: id }),
     onShowResults: showResults,
+    // 지역 패널의 숫자: 지역은 그대로 두고 접수 상태만 바꿈
+    onStatus: (status) => {
+      store.set({ status, visibleCount: PAGE_SIZE });
+      showResults();
+    },
   });
 
-  // 결과 위쪽의 '지역: 서울 ×' 표시 (누르면 전국으로)
-  const activeRegion = document.getElementById('active-region');
-  function renderActiveRegion(region) {
-    if (!region) {
-      activeRegion.replaceChildren();
-      return;
-    }
+  // 결과 위쪽의 조건 표시: '지역: 서울 ×', '접수 중만 ×' (누르면 그 조건 해제)
+  const activeChips = document.getElementById('active-region');
+  function chipButton(text, label, onClick) {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'chip-button active-region__chip';
-    chip.setAttribute('aria-label', `지역 조건 ${regionLabel(region)} 해제`);
-    chip.textContent = `지역: ${regionLabel(region)} ×`;
-    chip.addEventListener('click', () => store.set({ region: '', visibleCount: PAGE_SIZE }));
-    activeRegion.replaceChildren(chip);
+    chip.setAttribute('aria-label', label);
+    chip.textContent = text;
+    chip.addEventListener('click', onClick);
+    return chip;
+  }
+  function renderActiveChips({ region, status }) {
+    const chips = [];
+    if (region) {
+      chips.push(
+        chipButton(`지역: ${regionLabel(region)} ×`, `지역 조건 ${regionLabel(region)} 해제`, () =>
+          store.set({ region: '', visibleCount: PAGE_SIZE }),
+        ),
+      );
+    }
+    if (status) {
+      chips.push(
+        chipButton(`${STATUS_LABELS[status]}만 ×`, `${STATUS_LABELS[status]} 조건 해제`, () =>
+          store.set({ status: '', visibleCount: PAGE_SIZE }),
+        ),
+      );
+    }
+    activeChips.replaceChildren(...chips);
+  }
+
+  // 검색유형·지역·검색 조건·관심공고만 보기가 하나도 없는 상태인지 (위쪽 '전체 공고' 표시용)
+  const emptyFilters = createEmptyFilters(SEARCH_FIELDS);
+  function isUnfiltered(state) {
+    return (
+      state.category === URL_OPTIONS.defaults.category &&
+      !state.region &&
+      !state.favoritesOnly &&
+      JSON.stringify(state.filters) === JSON.stringify(emptyFilters)
+    );
+  }
+
+  // 위쪽 숫자를 눌렀을 때: 다른 조건을 풀어 숫자와 같은 건수가 나오게 하고, 접수 중·마감 임박은 마감이 가까운 순으로
+  function showStatus(status) {
+    const filters = createEmptyFilters(SEARCH_FIELDS);
+    searchForm.setValues(filters);
+    store.set({
+      category: URL_OPTIONS.defaults.category,
+      region: '',
+      filters,
+      favoritesOnly: false,
+      status,
+      sort: status ? { key: 'deadline', dir: 'asc' } : DEFAULT_SORT,
+      visibleCount: PAGE_SIZE,
+    });
+    showResults();
   }
 
   let prev = null;
@@ -319,6 +368,7 @@ async function init() {
       !prev ||
       prev.category !== state.category ||
       prev.region !== state.region ||
+      prev.status !== state.status ||
       prev.filters !== state.filters ||
       prev.sort !== state.sort ||
       prev.visibleCount !== state.visibleCount ||
@@ -333,11 +383,11 @@ async function init() {
       // 버튼마다 '지금 검색 조건에서 그 유형을 고르면 나올 공고 수'를 표시
       tabs.setCounts(
         Object.fromEntries(
-          CATEGORIES.map((c) => [c.id, filterPolicies(base, { ...state, category: c.id }, SEARCH_FIELDS).length]),
+          CATEGORIES.map((c) => [c.id, filterPolicies(base, { ...state, category: c.id }, SEARCH_FIELDS, filterOptions).length]),
         ),
       );
       currentResults = sortPolicies(
-        filterPolicies(base, state, SEARCH_FIELDS),
+        filterPolicies(base, state, SEARCH_FIELDS, filterOptions),
         state.sort,
         sortOptions(state.sort),
       );
@@ -354,7 +404,7 @@ async function init() {
       loadMore.render(visible.length, currentResults.length);
 
       // 지도: 지역 조건을 뺀 현재 검색 결과를 지역별로 셈
-      const withoutRegion = filterPolicies(base, { ...state, region: '' }, SEARCH_FIELDS);
+      const withoutRegion = filterPolicies(base, { ...state, region: '' }, SEARCH_FIELDS, filterOptions);
       const regionCounts = {};
       withoutRegion.forEach((policy) => {
         if (policy.region) regionCounts[policy.region] = (regionCounts[policy.region] ?? 0) + 1;
@@ -364,8 +414,13 @@ async function init() {
         counts: regionCounts,
         items: currentResults,
         total: withoutRegion.length,
+        statsItems: state.status
+          ? filterPolicies(base, { ...state, status: '' }, SEARCH_FIELDS, filterOptions)
+          : currentResults,
+        status: state.status,
       });
-      renderActiveRegion(state.region);
+      renderActiveChips(state);
+      summaryStats.setActive(state.status, { unfiltered: isUnfiltered(state) });
     } else if (favoritesChanged) {
       table.setFavorites(favorites);
     }
