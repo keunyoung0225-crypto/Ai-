@@ -2,10 +2,12 @@
 // 돌려주는 함수를 만들어 여기에 등록하고, scripts/sources.json에 그 type으로 출처를 추가합니다.
 import { collectBizinfo } from './bizinfo.js';
 import { collectCsv } from './csv.js';
+import { collectKstartup } from './kstartup.js';
 import { collectNaraBid } from './naraBid.js';
 
 export const collectors = {
   csv: collectCsv,
   naraBid: collectNaraBid,
   bizinfo: collectBizinfo,
+  kstartup: collectKstartup,
 };

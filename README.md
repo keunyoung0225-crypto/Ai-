@@ -29,7 +29,7 @@
 - **광고 영역**: PC(1100px 이상)는 화면 왼쪽 세로 광고(기본 160×600, 아래 손잡이로 세로 크기 조절, 스크롤해도 따라옴), 휴대폰·좁은 화면은 맨 아래 고정 띠 광고(320×50, 닫기 가능)
 - **접근성**: 키보드 초점 표시, '검색 결과로 바로가기', 움직임 줄이기 설정 존중
 - **휴대폰 알림(앱 설치형, PWA)**: 사이트를 홈 화면에 추가하면 앱처럼 열리고, 관심 키워드에 맞는 새 공고를 매일 아침 9시에 알림으로 받음 (무료 앱 ntfy로도 가능, 아래 '휴대폰 알림' 참고)
-- **매일 자동 갱신**: 매일 아침 구글 시트·CSV, 나라장터 API, 중소벤처기업부 지원사업(기업마당 API)에서 공고를 모아 데이터 갱신, 새 공고에 `NEW` 표시 (아래 '공고 데이터 매일 갱신' 참고)
+- **매일 자동 갱신**: 매일 아침 구글 시트·CSV, 나라장터 API, 중소벤처기업부 지원사업(기업마당 API), 창업진흥원(K-Startup API)에서 공고를 모아 데이터 갱신, 새 공고에 `NEW` 표시 (아래 '공고 데이터 매일 갱신' 참고)
 
 > 현재 공고 데이터(`data/policies.json`)는 **시연용 가상 데이터**입니다.
 
@@ -95,7 +95,7 @@ data/policies.json      공고 데이터
 alerts/subscriptions.json  휴대폰 알림 관심 키워드
 scripts/update-data.mjs 매일 공고 데이터 갱신 스크립트
 scripts/sources.json    갱신할 데이터 출처 설정 (켜기/끄기)
-scripts/collectors/     출처별 수집기 (csv: 구글 시트·CSV, naraBid: 나라장터 API, bizinfo: 기업마당 API)
+scripts/collectors/     출처별 수집기 (csv: 구글 시트·CSV, naraBid: 나라장터 API, bizinfo: 기업마당 API, kstartup: K-Startup API)
 scripts/notify.mjs      매일 아침 알림 발송 스크립트 (ntfy, 앱 알림)
 scripts/lib/webPush.js  앱 알림 보내기
 scripts/package.json    알림 발송에 쓰는 패키지(web-push) 목록
@@ -147,6 +147,7 @@ templates/policies-template.csv  공고 입력용 표 양식
 | `sheet` (구글 시트·CSV) | 직접 정리한 공고. 수의계약·위수탁지원사업 모두 가능 | `POLICY_SHEET_CSV_URL` |
 | `nara` (나라장터 API) | 조달청 나라장터의 수의계약 공고 자동 수집 | `DATA_GO_KR_KEY` |
 | `mss` (기업마당 API) | 중소벤처기업부 지원사업 공고 자동 수집 → `위수탁지원사업` | `BIZINFO_API_KEY` |
+| `kstartup` (K-Startup API) | 창업진흥원 창업지원사업 공고 자동 수집 → `위수탁지원사업` | `DATA_GO_KR_KEY` (나라장터와 같은 키) |
 
 **구글 시트로 관리하기 (권장)**
 1. `templates/policies-template.csv`를 구글 시트로 가져옵니다. 열: 공고ID(선택), 검색유형, 공고명, 공고일, 주체기관,
@@ -168,6 +169,16 @@ templates/policies-template.csv  공고 입력용 표 양식
 > ⚠ 나라장터 수집기는 실제 API로 시험하지 못했습니다. 처음 연결한 뒤 Actions 실행 결과를 확인하고,
 > 오류가 나면 공공데이터포털 문서의 주소(`endpoint`)·기능 이름(`operations`)·응답 필드 이름을
 > `sources.json`과 `scripts/collectors/naraBid.js`에 맞춰 주세요.
+
+**창업진흥원 창업지원사업 연결 (K-Startup API)**
+1. 공공데이터포털에서 **창업진흥원_K-Startup(사업소개,사업공고,콘텐츠 등) 조회서비스**를 활용신청합니다. (자동 승인, 1~2시간 뒤 사용 가능)
+2. 인증키는 계정마다 하나라 나라장터용 Secret `DATA_GO_KR_KEY`를 그대로 씁니다. `sources.json`의 `kstartup`이 켜져 있으면 됩니다.
+3. 모집 중(`rcrt_prgs_yn`이 N이 아닌) 공고만 `위수탁지원사업`으로 가져옵니다. (`onlyRecruiting: false`면 전부)
+4. 지원 지역(`경기`, `전남광주` 등)은 지도에 표시되고 `전국`은 지역 없음으로 둡니다. 접수 시작일을 공고일로, 접수 종료일을 마감일로 씁니다.
+
+> ⚠ K-Startup 수집기도 실제 API로 시험하지 못했습니다(시험용 가짜 서버로만 확인). 공고명 항목 이름을 문서로 확인하지 못해
+> 후보 이름을 차례로 찾습니다. 실행 결과에 'K-Startup 공고명을 찾지 못함' 경고가 나오면, 경고에 적힌 항목 이름 중 공고명을
+> `scripts/collectors/kstartup.js`의 `TITLE_FIELDS` 맨 앞에 넣어 주세요.
 
 **중소벤처기업부 지원사업 연결 (기업마당 API)**
 중소벤처기업부 지원사업 공고는 기업마당(bizinfo.go.kr)에 모여 있어, 기업마당 API로 가져옵니다.
