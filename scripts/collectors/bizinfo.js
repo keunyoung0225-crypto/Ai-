@@ -4,6 +4,7 @@
 // - ⚠ 이 수집기는 실제 API로 시험하지 못했습니다. 처음 연결한 뒤 Actions 실행 결과를 확인하고,
 //   오류가 나면 기업마당 API 안내의 요청 변수·응답 필드 이름에 맞춰 아래 변환 부분을 고치세요.
 import { toDateString } from '../../js/services/date.js';
+import { fetchWithRetry } from '../lib/http.js';
 
 const DEFAULT_ENDPOINT = 'https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do';
 const SITE = 'https://www.bizinfo.go.kr';
@@ -44,7 +45,7 @@ function toList(json) {
   return [];
 }
 
-export async function collectBizinfo(source, env) {
+export async function collectBizinfo(source, env, { log } = {}) {
   const keyEnv = source.keyEnv ?? 'BIZINFO_API_KEY';
   const key = env[keyEnv];
   if (!key) throw new Error(`인증키가 없습니다. GitHub Secrets에 ${keyEnv}를 등록하세요.`);
@@ -60,7 +61,7 @@ export async function collectBizinfo(source, env) {
     ...(source.hashtags ? { hashtags: source.hashtags } : {}),
   }).toString();
 
-  const response = await fetch(url);
+  const response = await fetchWithRetry(url, { name: '기업마당 API', log });
   const text = await response.text();
   if (!response.ok) throw new Error(`기업마당 API 오류 (${response.status}) ${text.slice(0, 120)}`);
   let json;

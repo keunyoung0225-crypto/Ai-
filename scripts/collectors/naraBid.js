@@ -3,6 +3,7 @@
 // - ⚠ 이 수집기는 실제 API로 시험하지 못했습니다. 공공데이터포털 문서에서 주소(endpoint)·
 //   기능 이름(operations)·응답 필드 이름을 확인하고, 다르면 sources.json 또는 아래 변환 부분을 고치세요.
 import { addDays } from '../lib/dates.js';
+import { fetchWithRetry } from '../lib/http.js';
 
 const DEFAULT_ENDPOINT = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService';
 const PAGE_SIZE = 100;
@@ -36,8 +37,8 @@ function apiError(status, text) {
   return new Error(`나라장터 API 오류 (${status}) ${String(text).replace(/\s+/g, ' ').slice(0, 120)}`);
 }
 
-async function fetchPage(url) {
-  const response = await fetch(url);
+async function fetchPage(url, log) {
+  const response = await fetchWithRetry(url, { name: '나라장터 API', log });
   const text = await response.text();
   if (!response.ok) throw apiError(response.status, text);
   let json;
@@ -68,7 +69,7 @@ export function normalizeServiceKey(key) {
   }
 }
 
-export async function collectNaraBid(source, env, { today }) {
+export async function collectNaraBid(source, env, { today, log }) {
   const keyEnv = source.keyEnv ?? 'DATA_GO_KR_KEY';
   const serviceKey = normalizeServiceKey(env[keyEnv]);
   if (!serviceKey) throw new Error(`인증키가 없습니다. GitHub Secrets에 ${keyEnv}를 등록하세요.`);
@@ -89,7 +90,7 @@ export async function collectNaraBid(source, env, { today }) {
         inqryEndDt: end,
         type: 'json',
       }).toString();
-      const { list, total } = await fetchPage(url);
+      const { list, total } = await fetchPage(url, log);
       raw.push(...list);
       if (!list.length || page * PAGE_SIZE >= total) break;
     }
