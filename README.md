@@ -46,6 +46,12 @@ python3 -m http.server 8000
 2. **Source**: `Deploy from a branch`, **Branch**: 배포할 브랜치 / `/ (root)` 선택 후 Save
 3. 잠시 후 `https://<사용자명>.github.io/<저장소명>/` 에서 확인
 
+## 방문자 수 보기
+Vercel Web Analytics로 방문자 수·페이지 조회 수·유입 경로·기기 비율을 봅니다. (쿠키를 쓰지 않음)
+1. Vercel 프로젝트 → **Analytics** 탭 → **Enable** (처음 한 번)
+2. 측정 코드는 `index.html` 위쪽에 이미 들어 있습니다. 방문 기록은 같은 **Analytics** 탭에서 확인합니다.
+- Vercel 주소로 들어온 방문만 기록됩니다. (GitHub Pages·내 컴퓨터에서 연 화면은 기록되지 않음)
+
 ## 링크 미리보기 (카카오톡·문자·SNS)
 링크를 보내면 제목·설명과 함께 `images/og-image.jpg`(1200×630) 이미지가 미리보기로 나옵니다.
 - 설정은 `index.html` 위쪽의 `og:` 줄들입니다. **사이트 주소가 바뀌면** 그 안의 `https://moaba-nine.vercel.app` 를 새 주소로 바꾸세요.
