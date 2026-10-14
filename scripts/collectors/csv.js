@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { CATEGORIES } from '../../js/config.js';
 import { parseCsv } from '../lib/csv.js';
+import { fetchWithRetry } from '../lib/http.js';
 
 // 열 이름(띄어쓰기 무시) → 공고 필드
 const COLUMN_ALIASES = {
@@ -62,10 +63,10 @@ function stableId(prefix, parts) {
   return `${prefix}-${hash}`;
 }
 
-async function readText(source, env, root) {
+async function readText(source, env, root, log) {
   const url = (source.urlEnv && env[source.urlEnv]) || source.url;
   if (url) {
-    const response = await fetch(url);
+    const response = await fetchWithRetry(url, { name: '구글 시트·CSV 주소', log });
     if (!response.ok) throw new Error(`CSV를 받지 못했습니다 (${response.status})`);
     return response.text();
   }
@@ -74,7 +75,7 @@ async function readText(source, env, root) {
 }
 
 export async function collectCsv(source, env, { root, log }) {
-  const rows = parseCsv(await readText(source, env, root));
+  const rows = parseCsv(await readText(source, env, root, log));
   if (!rows.length) return [];
 
   const fields = mapHeader(rows[0]);
