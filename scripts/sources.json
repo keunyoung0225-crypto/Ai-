@@ -30,6 +30,16 @@
         "중소벤처기업부"
       ],
       "count": 500
+    },
+    {
+      "id": "kstartup",
+      "type": "kstartup",
+      "name": "창업진흥원 K-Startup 사업공고",
+      "enabled": true,
+      "keyEnv": "DATA_GO_KR_KEY",
+      "category": "entrusted",
+      "onlyRecruiting": true,
+      "maxPages": 10
     }
   ]
 }

@@ -3,6 +3,7 @@
 // - ⚠ 이 수집기는 실제 API로 시험하지 못했습니다. 공공데이터포털 문서에서 주소(endpoint)·
 //   기능 이름(operations)·응답 필드 이름을 확인하고, 다르면 sources.json 또는 아래 변환 부분을 고치세요.
 import { addDays } from '../lib/dates.js';
+import { dataGoKrError, normalizeServiceKey } from '../lib/dataGoKr.js';
 import { fetchWithRetry } from '../lib/http.js';
 
 const DEFAULT_ENDPOINT = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService';
@@ -14,28 +15,8 @@ function toList(items) {
   return [];
 }
 
-// 공공데이터포털 공통 오류 코드 → 한국어 안내
-const ERROR_HELP = {
-  SERVICE_KEY_IS_NOT_REGISTERED_ERROR:
-    '등록되지 않은 인증키입니다. 공공데이터포털 마이페이지 → 활용신청 현황에서 "조달청_나라장터 입찰공고정보서비스"가 ' +
-    '승인되었는지 확인하세요. 승인 직후에는 1~2시간 뒤부터 쓸 수 있습니다.',
-  SERVICE_ACCESS_DENIED_ERROR: '이 API를 쓸 권한이 없습니다. 활용신청을 했는지 확인하세요.',
-  LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR: '하루 호출 횟수를 넘었습니다. 내일 다시 시도됩니다.',
-  DEADLINE_HAS_EXPIRED_ERROR: '활용 기간이 끝났습니다. 공공데이터포털에서 활용 기간을 연장하세요.',
-  UNREGISTERED_IP_ERROR: '등록되지 않은 IP입니다. 활용신청 정보에서 IP 제한을 없애 주세요.',
-};
-
-// 오류 응답(JSON 또는 XML)에서 오류 코드 찾기 (예: SERVICE_KEY_IS_NOT_REGISTERED_ERROR)
-function errorCodeOf(text) {
-  const codes = String(text).match(/[A-Z]+(?:_[A-Z]+)*_ERROR/g) ?? [];
-  return codes.find((code) => code in ERROR_HELP) ?? codes.find((code) => code !== 'SERVICE_ERROR');
-}
-
-function apiError(status, text) {
-  const code = errorCodeOf(text);
-  if (code) return new Error(`나라장터 API 오류(${code}): ${ERROR_HELP[code] ?? '공공데이터포털 안내를 확인하세요.'}`);
-  return new Error(`나라장터 API 오류 (${status}) ${String(text).replace(/\s+/g, ' ').slice(0, 120)}`);
-}
+const API_NAME = '조달청_나라장터 입찰공고정보서비스';
+const apiError = (status, text) => dataGoKrError('나라장터 API', API_NAME, status, text);
 
 async function fetchPage(url, log) {
   const response = await fetchWithRetry(url, { name: '나라장터 API', log });
@@ -55,18 +36,6 @@ async function fetchPage(url, log) {
   if (json?.OpenAPI_ServiceResponse) throw apiError(response.status, text);
   const body = json?.response?.body ?? {};
   return { list: toList(body.items), total: Number(body.totalCount ?? 0) };
-}
-
-// 공공데이터포털 화면의 인증키는 두 가지(Encoding/Decoding)입니다. 어느 쪽을 넣어도 되도록
-// '%'가 들어 있는 Encoding 키는 원래 값으로 되돌린 뒤 주소에 넣습니다. (두 번 인코딩되면 '등록되지 않은 키' 오류)
-export function normalizeServiceKey(key) {
-  const trimmed = String(key ?? '').trim();
-  if (!trimmed.includes('%')) return trimmed;
-  try {
-    return decodeURIComponent(trimmed);
-  } catch {
-    return trimmed;
-  }
 }
 
 export async function collectNaraBid(source, env, { today, log }) {
