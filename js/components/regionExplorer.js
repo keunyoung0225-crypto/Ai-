@@ -39,7 +39,7 @@ function legendLabels(max) {
 
 export function createRegionExplorer(
   container,
-  { regions, paths, viewBox, deadlineWarningDays, onSelect, onOpenDetail, onShowResults },
+  { regions, paths, viewBox, deadlineWarningDays, onSelect, onOpenDetail, onShowResults, onStatus },
 ) {
   const labels = Object.fromEntries(regions.map((r) => [r.id, r.label]));
 
@@ -141,18 +141,34 @@ export function createRegionExplorer(
 
   let currentSelected = '';
 
-  function renderStats(items) {
+  // 공고·접수 중·마감 임박 숫자: 누르면 이 지역의 그 공고만 목록에 보여 줌 (onStatus)
+  function renderStats(items, status) {
     const statuses = items.map((p) => deadlineStatus(p.deadline, deadlineWarningDays));
     const values = [
-      ['공고', items.length],
-      ['접수 중', statuses.filter((s) => s && s.tone !== 'closed').length],
-      ['마감 임박', statuses.filter((s) => s?.tone === 'urgent').length],
+      ['공고', items.length, ''],
+      ['접수 중', statuses.filter((s) => s && s.tone !== 'closed').length, 'open'],
+      ['마감 임박', statuses.filter((s) => s?.tone === 'urgent').length, 'closing'],
     ];
     stats.replaceChildren(
-      ...values.map(([label, value]) => {
-        const item = el('div', `region-panel__stat${label === '마감 임박' && value ? ' is-urgent' : ''}`);
+      ...values.map(([label, value, key]) => {
+        const active = key === status && Boolean(key);
+        const item = el(
+          'div',
+          `region-panel__stat${label === '마감 임박' && value ? ' is-urgent' : ''}${active ? ' is-active' : ''}`,
+        );
         const desc = el('dd');
-        desc.append(el('strong', '', value.toLocaleString('ko-KR')), '건');
+        const number = el('strong', '', value.toLocaleString('ko-KR'));
+        if (onStatus) {
+          const button = el('button', 'region-panel__stat-button');
+          button.type = 'button';
+          button.setAttribute('aria-pressed', String(active));
+          button.setAttribute('aria-label', `${label} ${value}건 목록 보기`);
+          button.append(number, '건');
+          button.addEventListener('click', () => onStatus(key));
+          desc.append(button);
+        } else {
+          desc.append(number, '건');
+        }
         item.append(el('dt', '', label), desc);
         return item;
       }),
@@ -190,7 +206,8 @@ export function createRegionExplorer(
   return {
     // selected: 고른 지역 id('' = 전국), counts: { 지역 id: 공고 수 } (지역 조건을 뺀 현재 검색 기준),
     // items: 지금 결과(고른 지역 포함), total: 지역 조건을 뺀 전체 건수
-    render({ selected, counts: nextCounts, items, total }) {
+    // statsItems: 위쪽 숫자를 셀 공고(접수 상태 조건만 뺀 결과), status: 지금 접수 상태 조건
+    render({ selected, counts: nextCounts, items, total, statsItems, status = '' }) {
       currentSelected = selected;
       counts = nextCounts;
       const max = Math.max(0, ...Object.values(nextCounts));
@@ -225,7 +242,7 @@ export function createRegionExplorer(
       hint.textContent = selected
         ? '지도에서 같은 지역을 다시 누르거나 [전국]을 고르면 전체로 돌아갑니다.'
         : '지도에서 지역을 누르면 그 지역 공고만 볼 수 있습니다.';
-      renderStats(items);
+      renderStats(statsItems ?? items, status);
       renderTop(items);
 
       const showButton = el('button', 'btn btn--primary', `${label} 공고 ${items.length.toLocaleString('ko-KR')}건 보기`);

@@ -1,10 +1,12 @@
 // 검색 상태 ↔ URL 주소 변환 (검색 결과·상세 보기 링크 공유용)
 // 예: ?cat=contract&title=용역&announceDateFrom=2026-09-01&sort=budget:desc&id=2026-C-001
+// status=open(접수 중) | closing(마감 임박)
 // 파라미터 이름은 config의 SEARCH_FIELDS key에서 만들어집니다. (기간은 key + From/To)
 import { createEmptyFilters } from '../state.js';
 import { isDateString } from './date.js';
 
 const SORT_DIRS = ['asc', 'desc'];
+const STATUSES = ['open', 'closing'];
 
 export function readUrlState(search, { categories, fields, columns, regions = [], defaults }) {
   const params = new URLSearchParams(search);
@@ -28,6 +30,7 @@ export function readUrlState(search, { categories, fields, columns, regions = []
   return {
     category: categories.some((c) => c.id === category) ? category : defaults.category,
     region: regions.some((r) => r.id === region) ? region : '',
+    status: STATUSES.includes(params.get('status')) ? params.get('status') : '',
     filters,
     sort: sortable && SORT_DIRS.includes(sortDir) ? { key: sortKey, dir: sortDir } : defaults.sort,
     detailId: params.get('id') || null,
@@ -39,6 +42,7 @@ export function buildUrlSearch(state, { fields, defaults }) {
 
   if (state.category !== defaults.category) params.set('cat', state.category);
   if (state.region) params.set('region', state.region);
+  if (state.status) params.set('status', state.status);
   fields.forEach(({ key, type }) => {
     const value = state.filters[key];
     if (type === 'dateRange') {
