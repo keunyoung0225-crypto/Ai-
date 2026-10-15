@@ -1812,6 +1812,21 @@ body:has(.detail-modal[open]) {
   object-fit: cover;
 }
 
+/* 광고가 바뀔 때 살짝 흐려졌다 나타남 */
+.ad-slot__link img {
+  transition: opacity 0.2s ease;
+}
+
+.ad-slot__link img.is-changing {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-slot__link img {
+    transition: none;
+  }
+}
+
 .ad-slot__tag {
   position: absolute;
   top: 4px;
