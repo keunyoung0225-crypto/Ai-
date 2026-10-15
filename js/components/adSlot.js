@@ -24,22 +24,25 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
   tag.textContent = '광고';
 
   const sizeText = document.createElement('span');
-  const imageUrl = resolveImageUrl(slot.imageUrl);
-  const isImageAd = imageUrl && isSafeUrl(imageUrl) && isSafeUrl(slot.linkUrl);
-  if (isImageAd) {
+  const ads = adList(slot);
+  if (ads.length) {
     const link = document.createElement('a');
     link.className = 'ad-slot__link';
-    link.href = slot.linkUrl;
     link.target = '_blank';
     link.rel = 'noopener noreferrer sponsored';
     const image = document.createElement('img');
-    image.src = imageUrl;
-    image.alt = slot.alt || '광고';
     image.width = slot.width;
     image.height = slot.height;
     image.loading = 'lazy';
+    const show = (ad) => {
+      link.href = ad.linkUrl;
+      image.src = ad.imageUrl;
+      image.alt = ad.alt;
+    };
+    show(ads[0]);
     link.append(image);
     frame.append(link);
+    if (ads.length > 1 && slot.rotateSeconds > 0) startRotation(ads, slot.rotateSeconds, image, show);
   } else {
     const placeholder = document.createElement('div');
     placeholder.className = 'ad-slot__placeholder';
@@ -154,6 +157,46 @@ export function renderAdSlot(container, slot, { onClose } = {}) {
 
   container.replaceChildren(...children);
   container.hidden = false;
+}
+
+// 설정의 광고 목록 (예전 방식처럼 imageUrl·linkUrl을 슬롯에 바로 적어도 됨). 주소가 안전한 광고만
+function adList(slot) {
+  const list = slot.ads ?? [{ imageUrl: slot.imageUrl, linkUrl: slot.linkUrl, alt: slot.alt }];
+  return list
+    .map((ad) => ({ ...ad, imageUrl: resolveImageUrl(ad.imageUrl), alt: ad.alt || '광고' }))
+    .filter((ad) => ad.imageUrl && isSafeUrl(ad.imageUrl) && isSafeUrl(ad.linkUrl));
+}
+
+// seconds초마다 다음 광고로 바꿈. 다음 이미지를 미리 받아 둔 뒤 바꾸고, 불러오지 못한 이미지(아직 안 올린 파일 등)는 건너뜀
+function startRotation(ads, seconds, image, show) {
+  const broken = new Set();
+  let index = 0;
+
+  function next() {
+    if (document.hidden) return; // 다른 탭을 보는 동안은 멈춤
+    const tryAt = (offset) => {
+      if (offset >= ads.length) return; // 바꿀 수 있는 광고가 없음
+      const candidate = (index + offset) % ads.length;
+      if (broken.has(candidate)) return tryAt(offset + 1);
+      const preload = new Image();
+      preload.onload = () => {
+        index = candidate;
+        image.classList.add('is-changing');
+        setTimeout(() => {
+          show(ads[index]);
+          image.classList.remove('is-changing');
+        }, 200);
+      };
+      preload.onerror = () => {
+        broken.add(candidate);
+        tryAt(offset + 1);
+      };
+      preload.src = ads[candidate].imageUrl;
+    };
+    tryAt(1);
+  }
+
+  setInterval(next, seconds * 1000);
 }
 
 // 'images/ad-side.jpg'처럼 이 사이트 안의 경로도 받도록 전체 주소로 바꿈
