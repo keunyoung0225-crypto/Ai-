@@ -203,8 +203,8 @@ export const AD_SLOTS = {
     rotateSeconds: 30,
     ads: [
       { imageUrl: 'images/ad-side.jpg', linkUrl: 'https://www.forest.go.kr', alt: '산림청 홈페이지 산불조심' },
-      // 두 번째 광고 (linkUrl: 누르면 갈 교육 신청 주소로 바꾸세요)
-      { imageUrl: 'images/ad-side-2.jpg', linkUrl: 'https://www.forest.go.kr', alt: '수의계약 및 위수탁 지원사업 교육, 지금 신청하세요' },
+      // 두 번째 광고 (누르면 네이버 홈으로 이동)
+      { imageUrl: 'images/ad-side-2.jpg', linkUrl: 'https://www.naver.com', alt: '수의계약 및 위수탁 지원사업 교육, 지금 신청하세요' },
     ],
   },
   bottom: {
@@ -214,8 +214,8 @@ export const AD_SLOTS = {
     rotateSeconds: 30,
     ads: [
       { imageUrl: 'images/ad-bottom.jpg', linkUrl: 'https://www.forest.go.kr', alt: '산불조심, 산불 발견 시 즉시 119·112 신고' },
-      // 두 번째 광고 (linkUrl: 누르면 갈 교육 신청 주소로 바꾸세요)
-      { imageUrl: 'images/ad-bottom-2.jpg', linkUrl: 'https://www.forest.go.kr', alt: '수의계약 및 위수탁 지원사업 교육, 지금 신청하세요' },
+      // 두 번째 광고 (누르면 네이버 홈으로 이동)
+      { imageUrl: 'images/ad-bottom-2.jpg', linkUrl: 'https://www.naver.com', alt: '수의계약 및 위수탁 지원사업 교육, 지금 신청하세요' },
     ],
     closable: true,
     labelOutside: true,
