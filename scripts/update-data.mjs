@@ -4,6 +4,7 @@
 // - 처음 들어온 공고에는 수집한 날짜(firstSeen)를 기록하고, 그 목록을 알림 단계에 넘깁니다.
 // - 출처 하나가 실패해도 그 출처의 기존 공고는 그대로 두고 나머지는 계속 갱신합니다.
 // - 실제 출처에서 공고를 받아오면 시연용 샘플 공고(source: "sample")는 지웁니다.
+// - removeClosed가 true면 지원마감일이 지난 공고는 받지도 남기지도 않습니다. (지원 가능한 공고만)
 // - 마감일(없으면 공고일)이 keepDays일보다 오래된 공고는 지웁니다.
 //
 // 사용법:
@@ -63,6 +64,9 @@ async function main() {
     console.log('켜 둔 데이터 출처가 없습니다. scripts/sources.json에서 출처의 "enabled"를 true로 바꾸세요.');
   }
 
+  // 지원 가능한 공고인지 (마감일이 없으면 알 수 없어 남김)
+  const isOpen = (policy) => !config.removeClosed || !isDateString(policy.deadline) || policy.deadline >= today;
+
   const report = [];
   const newIds = [];
   let realItems = 0;
@@ -78,7 +82,10 @@ async function main() {
     }
     try {
       const raw = await collect(source, process.env, { today, root: ROOT, log: console.log });
-      const items = normalizePolicies(raw);
+      const received = normalizePolicies(raw);
+      // 마감 지난 공고는 새 공고·알림 대상에서도 빠지도록 처음부터 제외
+      const items = received.filter(isOpen);
+      const closedNote = received.length > items.length ? ` (마감 지난 ${received.length - items.length}건 제외)` : '';
       // 이 출처에서 처음 가져오는 경우(첫 연결)는 알림 대상에서 제외
       const firstImport = !existing.some((policy) => policy.source === source.id);
       let added = 0;
@@ -102,8 +109,8 @@ async function main() {
 
       realItems += items.length;
       const note = firstImport && added ? ' (첫 연결이라 알림은 보내지 않음)' : '';
-      console.log(`✔ ${label}: ${items.length}건 수신, 새 공고 ${added}건, 변경 ${changed}건${note}`);
-      report.push(`| ${label} | ${items.length} | ${added} | ${changed} | 성공${note} |`);
+      console.log(`✔ ${label}: ${items.length}건 수신${closedNote}, 새 공고 ${added}건, 변경 ${changed}건${note}`);
+      report.push(`| ${label} | ${items.length} | ${added} | ${changed} | 성공${closedNote}${note} |`);
     } catch (error) {
       failed += 1;
       // 오류 문구의 줄바꿈·'|'가 요약 표를 깨뜨리지 않도록 한 줄로 정리
@@ -119,6 +126,8 @@ async function main() {
   if (realItems > 0) {
     policies = policies.filter((policy) => (policy.source ?? SAMPLE_SOURCE) !== SAMPLE_SOURCE);
   }
+  // 마감 지난 공고 정리 (어제까지 접수였던 공고 포함)
+  policies = policies.filter(isOpen);
   // 오래된 공고 정리
   const cutoff = addDays(today, -(config.keepDays ?? 365));
   policies = policies.filter((policy) => (policy.deadline ?? policy.announceDate ?? today) >= cutoff);

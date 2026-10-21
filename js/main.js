@@ -13,6 +13,7 @@ import {
   DEFAULT_SORT,
   DETAIL_FIELDS,
   EXPORT_FIELDS,
+  HIDE_CLOSED,
   PAGE_SIZE,
   RECENT_SEARCH_LIMIT,
   RECOMMENDER,
@@ -143,7 +144,11 @@ async function init() {
     table.setError('공고 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     return;
   }
-  const { policies } = loaded;
+  // 마감 지난 공고는 빼고 지원 가능한 공고만 (데이터 갱신 뒤 날짜가 바뀐 경우까지 화면에서 한 번 더 거름)
+  const today = todayString();
+  const policies = HIDE_CLOSED
+    ? loaded.policies.filter((policy) => !isDateString(policy.deadline) || policy.deadline >= today)
+    : loaded.policies;
   document.getElementById('data-notice').textContent = dataNotice(loaded);
   // 위쪽 숫자(전체 공고·접수 중·마감 임박)를 누르면 다른 조건을 모두 풀고 그 공고만 목록에 보여 줌
   const summaryStats = renderSummaryStats(document.getElementById('summary-stats'), policies, {
@@ -239,7 +244,6 @@ async function init() {
   // 최근 검색 공고: 마지막으로 검색한 키워드를 기억했다가, 키워드칸이 비어 있을 때 맞는 공고를 보여줌
   // 접수 중인 공고를 먼저, 그다음 최신 공고일 순
   let recentKeyword = readValue(STORAGE_KEYS.recentKeyword) ?? '';
-  const today = todayString();
   const recentMatches = (keyword) =>
     policies
       .filter((policy) => matchesKeyword(policy, keyword, keywordField.fields))

@@ -130,6 +130,10 @@ export const PAGE_SIZE = 10;
 // 마감 임박으로 강조할 기준(일)
 export const DEADLINE_WARNING_DAYS = 7;
 
+// true면 지원마감일이 지난 공고는 화면에 보이지 않고, 지원 가능한 공고만 보여 줍니다.
+// (마감일이 없는 공고는 지원 가능 여부를 알 수 없어 그대로 보여 줌. 매일 갱신 때도 마감 지난 공고는 데이터에서 지움)
+export const HIDE_CLOSED = true;
+
 // 매일 갱신에서 새로 들어온 공고에 'NEW' 표시를 붙이는 기간(일). 0이면 표시 안 함
 export const NEW_BADGE_DAYS = 2;
 
