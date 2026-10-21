@@ -1,5 +1,6 @@
 {
   "keepDays": 365,
+  "removeClosed": true,
   "sources": [
     {
       "id": "sheet",
