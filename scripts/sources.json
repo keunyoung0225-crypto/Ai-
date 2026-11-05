@@ -42,5 +42,15 @@
       "onlyRecruiting": true,
       "maxPages": 10
     }
+    {
+      "id": "sosang",
+      "type": "sosang",
+      "name": "소상공인시장진흥공단",
+      "enabled": true,
+      "keyEnv": "DATA_GO_KR_KEY",
+      "category": "entrusted",
+      "onlyRecruiting": true,
+      "maxPages": 10
+    }
   ]
 }
