@@ -41,16 +41,22 @@
       "category": "entrusted",
       "onlyRecruiting": true,
       "maxPages": 10
-    }
+    },
     {
       "id": "sosang",
-      "type": "sosang",
-      "name": "소상공인시장진흥공단",
+      "type": "bizinfo",
+      "name": "소상공인시장진흥공단 지원사업 (기업마당)",
       "enabled": true,
-      "keyEnv": "DATA_GO_KR_KEY",
+      "keyEnv": "BIZINFO_API_KEY",
       "category": "entrusted",
-      "onlyRecruiting": true,
-      "maxPages": 10
+      "agencyIncludes": [
+        "소상공인시장진흥공단"
+      ],
+      "agencyFields": [
+        "jrsdInsttNm",
+        "excInsttNm"
+      ],
+      "count": 500
     }
   ]
 }

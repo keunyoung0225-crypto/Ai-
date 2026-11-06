@@ -159,10 +159,6 @@ async function main() {
       await mkdir(path.dirname(newFile), { recursive: true });
       await writeFile(newFile, `${JSON.stringify({ date: today, ids: newIds }, null, 2)}\n`);
     }
-    // 수집 대상 실행 부분에 추가
-if (sourcesConfig.myApi?.enabled) {
-  const myApiData = await collectMyApi();
-  allPolicies.push(...myApiData);
   }
 
   // 켜 둔 출처가 모두 실패하면 작업을 실패로 표시해 알 수 있게 함

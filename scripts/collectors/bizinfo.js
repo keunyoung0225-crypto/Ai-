@@ -1,6 +1,7 @@
 // 기업마당(bizinfo.go.kr) 지원사업 공고에서 중소벤처기업부 등 원하는 부처의 공고 가져오기
 // - 기업마당 누리집의 '정책정보 개방 → API 목록 → 지원사업정보 API'에서 사용 신청 후 받은 인증키 필요
 // - 기업마당에는 여러 부처·지자체 공고가 모여 있으므로, 소관 부처(jrsdInsttNm) 이름으로 골라냅니다. (sources.json의 agencyIncludes)
+// - 수행기관(excInsttNm) 이름으로 고르려면 sources.json에 "agencyFields": ["jrsdInsttNm", "excInsttNm"]을 넣습니다.
 // - ⚠ 이 수집기는 실제 API로 시험하지 못했습니다. 처음 연결한 뒤 Actions 실행 결과를 확인하고,
 //   오류가 나면 기업마당 API 안내의 요청 변수·응답 필드 이름에 맞춰 아래 변환 부분을 고치세요.
 import { toDateString } from '../../js/services/date.js';
@@ -71,9 +72,13 @@ export async function collectBizinfo(source, env, { log } = {}) {
     throw new Error(`기업마당 API가 JSON이 아닌 응답을 보냈습니다. 인증키를 확인하세요: ${text.slice(0, 160)}`);
   }
 
+  // 기관 이름을 찾을 칸 (sources.json의 agencyFields). 기본은 소관 부처(jrsdInsttNm)
+  // 소상공인시장진흥공단처럼 부처 아래 기관은 수행기관(excInsttNm)에 이름이 들어가므로 그 칸도 함께 찾음
   const agencyNames = [].concat(source.agencyIncludes ?? []);
+  const agencyFields = [].concat(source.agencyFields ?? ['jrsdInsttNm']);
   const wanted = (item) =>
-    !agencyNames.length || agencyNames.some((name) => String(item.jrsdInsttNm ?? '').includes(name));
+    !agencyNames.length ||
+    agencyNames.some((name) => agencyFields.some((field) => String(item[field] ?? '').includes(name)));
 
   return toList(json)
     .filter(wanted)
