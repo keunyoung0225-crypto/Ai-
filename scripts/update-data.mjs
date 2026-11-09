@@ -39,8 +39,10 @@ function byNewest(a, b) {
 }
 
 // 같은 공고인지 비교할 때 수집 날짜는 빼고 비교
+// 출처(source)는 비교하지 않음. 두 출처가 같은 공고를 받으면(예: mss와 sosang) 출처 표시만 바뀌어
+// 매일 '변경'으로 세는 일을 막음. 파일 저장 여부는 changedFile에서 전체 내용으로 따로 판단함
 function sameContent(a, b) {
-  const strip = ({ firstSeen, ...rest }) => rest;
+  const strip = ({ firstSeen, source, ...rest }) => rest;
   return JSON.stringify(strip(a)) === JSON.stringify(strip(b));
 }
 
