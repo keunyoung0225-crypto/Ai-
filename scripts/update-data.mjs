@@ -20,6 +20,7 @@ import { DATA_URL } from '../js/config.js';
 import { normalizePolicies } from '../js/data/normalize.js';
 import { isDateString } from '../js/services/date.js';
 import { collectors } from './collectors/index.js';
+import { describeServiceKey } from './lib/dataGoKr.js';
 import { addDays, koreaDate } from './lib/dates.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -116,7 +117,11 @@ async function main() {
     } catch (error) {
       failed += 1;
       // 오류 문구의 줄바꿈·'|'가 요약 표를 깨뜨리지 않도록 한 줄로 정리
-      const message = String(error.message).replace(/\s+/g, ' ').replace(/\|/g, '/').trim();
+      let message = String(error.message).replace(/\s+/g, ' ').replace(/\|/g, '/').trim();
+      // 인증키 오류면 Secrets에 든 키의 길이·끝 6자를 덧붙여, 포털의 지금 키와 비교할 수 있게 함
+      if (/SERVICE_KEY|인증키/.test(message) && source.keyEnv) {
+        message += ` [Secrets ${source.keyEnv}: ${describeServiceKey(process.env[source.keyEnv])}]`;
+      }
       console.error(`✘ ${label}: ${message}`);
       console.log(`::warning title=공고 수집 실패::${label}: ${message}`);
       report.push(`| ${label} | - | - | - | 실패: ${message} |`);
