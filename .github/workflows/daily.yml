@@ -76,6 +76,21 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Vercel 다시 배포 요청
+        # 저장소 Secrets에 VERCEL_DEPLOY_HOOK(Vercel 프로젝트 → Settings → Git → Deploy Hooks 주소)을 넣으면
+        # 공고 데이터를 저장한 뒤 Vercel 사이트를 바로 다시 배포함. 없으면 건너뜀
+        if: ${{ steps.commit.outputs.changed == 'true' }}
+        continue-on-error: true
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK이 없어 건너뜁니다."
+            exit 0
+          fi
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK" > /dev/null
+          echo "Vercel 다시 배포를 요청했습니다."
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+
       - name: 알림 발송 도구 설치
         run: npm ci --prefix scripts --no-audit --no-fund
 
