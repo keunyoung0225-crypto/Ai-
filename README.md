@@ -139,6 +139,13 @@ templates/policies-template.csv  공고 입력용 표 양식
 매일 08:30(한국 시각)에 GitHub Actions가 `scripts/update-data.mjs`로 공고를 모아 `data/policies.json`을 갱신하고
 저장소에 저장합니다. 사이트(GitHub Pages)는 저장된 데이터로 자동으로 다시 만들어지고, 이어서 휴대폰 알림을 보냅니다.
 
+**Vercel 사이트에 바로 반영하기 (선택)**
+Vercel이 GitHub 저장소와 연결돼 있으면 main에 저장될 때마다 자동으로 다시 배포됩니다.
+자동 배포가 안 되면 Deploy Hook을 등록합니다.
+1. Vercel 프로젝트 → **Settings → Git → Deploy Hooks**에서 이름(예: `daily`)과 브랜치 `main`을 넣고 **Create Hook**을 누릅니다.
+2. 만들어진 주소를 GitHub 저장소 Secrets에 `VERCEL_DEPLOY_HOOK`으로 등록합니다.
+3. 이제 매일 공고 데이터를 저장한 뒤 Vercel 다시 배포를 요청합니다. (Secret이 없으면 이 단계는 건너뜀)
+
 ### 데이터 출처 켜기
 `scripts/sources.json`에서 쓸 출처의 `"enabled"`를 `true`로 바꾸고, 필요한 값을 GitHub 저장소
 **Settings → Secrets and variables → Actions → Secrets**에 등록합니다. 여러 출처를 함께 써도 됩니다.
