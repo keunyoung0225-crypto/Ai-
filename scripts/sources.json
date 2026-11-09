@@ -33,16 +33,6 @@
       "count": 500
     },
     {
-      "id": "kstartup",
-      "type": "kstartup",
-      "name": "창업진흥원 K-Startup 사업공고",
-      "enabled": true,
-      "keyEnv": "DATA_GO_KR_KEY",
-      "category": "entrusted",
-      "onlyRecruiting": true,
-      "maxPages": 10
-    },
-    {
       "id": "sosang",
       "type": "bizinfo",
       "name": "소상공인시장진흥공단 지원사업 (기업마당)",
