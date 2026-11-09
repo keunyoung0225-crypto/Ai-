@@ -48,21 +48,43 @@ export async function collectNaraBid(source, env, { today, log }) {
   const end = `${today.replaceAll('-', '')}2359`;
   const raw = [];
 
-  for (const operation of source.operations ?? ['getBidPblancListInfoServc']) {
-    for (let page = 1; page <= (source.maxPages ?? 10); page += 1) {
-      const url = new URL(`${source.endpoint ?? DEFAULT_ENDPOINT}/${operation}`);
-      url.search = new URLSearchParams({
-        serviceKey,
-        pageNo: String(page),
-        numOfRows: String(PAGE_SIZE),
-        inqryDiv: '1',
-        inqryBgnDt: begin,
-        inqryEndDt: end,
-        type: 'json',
-      }).toString();
-      const { list, total } = await fetchPage(url, log);
-      raw.push(...list);
-      if (!list.length || page * PAGE_SIZE >= total) break;
+  // 2026-11 '02' 개편 뒤 기능 이름이 'getBidPblancListInfoServc02'처럼 바뀐 경우가 있어,
+  // 기능 이름마다 '02'를 붙인 이름 → 원래 이름 순서로 시도함. 없는 기능이면 NO_OPENAPI_SERVICE_ERROR가 옴
+  const candidatesOf = (operation) => (/\d{2}$/.test(operation) ? [operation] : [`${operation}02`, operation]);
+
+  for (const baseOperation of source.operations ?? ['getBidPblancListInfoServc']) {
+    let done = false;
+    const tried = [];
+    for (const operation of candidatesOf(baseOperation)) {
+      tried.push(operation);
+      try {
+        for (let page = 1; page <= (source.maxPages ?? 10); page += 1) {
+          const url = new URL(`${source.endpoint ?? DEFAULT_ENDPOINT}/${operation}`);
+          url.search = new URLSearchParams({
+            serviceKey,
+            pageNo: String(page),
+            numOfRows: String(PAGE_SIZE),
+            inqryDiv: '1',
+            inqryBgnDt: begin,
+            inqryEndDt: end,
+            type: 'json',
+          }).toString();
+          const { list, total } = await fetchPage(url, log);
+          raw.push(...list);
+          if (!list.length || page * PAGE_SIZE >= total) break;
+        }
+        log?.(`  나라장터 기능 이름: ${operation}`);
+        done = true;
+        break;
+      } catch (error) {
+        if (!/NO_OPENAPI_SERVICE_ERROR/.test(error.message)) throw error;
+      }
+    }
+    if (!done) {
+      throw new Error(
+        `나라장터 API에 이 기능이 없습니다(NO_OPENAPI_SERVICE_ERROR). 시도한 이름: ${tried.join(', ')}. ` +
+          '공공데이터포털 활용신청 상세의 상세기능 이름을 sources.json의 operations에 적어 주세요.',
+      );
     }
   }
 
