@@ -6,7 +6,8 @@ import { addDays } from '../lib/dates.js';
 import { dataGoKrError, normalizeServiceKey } from '../lib/dataGoKr.js';
 import { fetchWithRetry } from '../lib/http.js';
 
-const DEFAULT_ENDPOINT = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService';
+// 공공데이터포털 활용신청 상세의 End Point와 같아야 함 (주소가 다르면 '등록되지 않은 인증키' 오류)
+const DEFAULT_ENDPOINT = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService02';
 const PAGE_SIZE = 100;
 
 function toList(items) {

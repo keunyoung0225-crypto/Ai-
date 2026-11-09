@@ -170,6 +170,8 @@ templates/policies-template.csv  공고 입력용 표 양식
 > ⚠ 나라장터 수집기는 실제 API로 시험하지 못했습니다. 처음 연결한 뒤 Actions 실행 결과를 확인하고,
 > 오류가 나면 공공데이터포털 문서의 주소(`endpoint`)·기능 이름(`operations`)·응답 필드 이름을
 > `sources.json`과 `scripts/collectors/naraBid.js`에 맞춰 주세요.
+> 주소(`endpoint`)는 공공데이터포털 활용신청 상세의 **End Point**와 같아야 합니다. 지금은 `https://apis.data.go.kr/1230000/ad/BidPublicInfoService02`입니다.
+> 주소가 다르면 인증키가 맞아도 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR`가 납니다.
 
 **중소벤처기업부 지원사업 연결 (기업마당 API)**
 중소벤처기업부 지원사업 공고는 기업마당(bizinfo.go.kr)에 모여 있어, 기업마당 API로 가져옵니다.
