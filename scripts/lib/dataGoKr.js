@@ -27,11 +27,26 @@ export function dataGoKrError(name, api, status, text) {
 // 공공데이터포털 화면의 인증키는 두 가지(Encoding/Decoding)입니다. 어느 쪽을 넣어도 되도록
 // '%'가 들어 있는 Encoding 키는 원래 값으로 되돌린 뒤 주소에 넣습니다. (두 번 인코딩되면 '등록되지 않은 키' 오류)
 export function normalizeServiceKey(key) {
-  const trimmed = String(key ?? '').trim();
+  // 앞뒤 공백·줄바꿈과, 복사할 때 함께 들어간 따옴표를 지움
+  const trimmed = String(key ?? '').trim().replace(/^["']+|["']+$/g, '');
   if (!trimmed.includes('%')) return trimmed;
   try {
     return decodeURIComponent(trimmed);
   } catch {
     return trimmed;
   }
+}
+
+// Secrets에 든 키가 포털의 지금 키와 같은지 사람이 비교할 수 있도록 앞 4자·끝 4자만 보여 줌
+// (키 전체는 로그에 남기지 않음. Encoding 키도 원래 값으로 바꿔 보여 주므로 포털의 Decoding 키와 비교)
+export function describeServiceKey(key) {
+  const raw = String(key ?? '').trim();
+  if (!raw) return '비어 있음';
+  const notes = [];
+  if (/\s/.test(raw)) notes.push('중간에 공백·줄바꿈 있음');
+  if (/^["']|["']$/.test(raw)) notes.push('따옴표 포함');
+  const body = normalizeServiceKey(raw).replace(/=+$/, '');
+  const kind = raw.includes('%') ? 'Encoding 키로 넣음' : 'Decoding 키로 넣음';
+  return `${kind}, Decoding 키 기준 앞 4자 '${body.slice(0, 4)}…' 끝 4자 '…${body.slice(-4)}'` +
+    (notes.length ? ` (⚠ ${notes.join(', ')})` : '');
 }
